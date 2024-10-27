@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "919095511311",
+    "project_id": "glucoguide-828c5",
+    "storage_bucket": "glucoguide-828c5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:919095511311:android:a68ccde7ec839faa32967a",
+        "android_client_info": {
+          "package_name": "com.example.glucoguide"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvmyBJ5cVbERaQmj4WAcIIc8eny8WWK24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
