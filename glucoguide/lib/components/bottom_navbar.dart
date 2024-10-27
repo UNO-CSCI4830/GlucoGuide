@@ -29,12 +29,12 @@ class BottomNavBar extends StatelessWidget {
           label: 'Profile',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: 'Settings',
+          icon: Icon(Icons.notifications),
+          label: 'Alerts',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.fastfood),
-          label: 'Track Food',
+          label: 'Track',
         ),
       ],
     );
