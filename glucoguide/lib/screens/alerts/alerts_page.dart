@@ -40,17 +40,31 @@ class Add_Alert extends StatelessWidget {
   Add_Alert({super.key});
   final _alertName = TextEditingController();
 
-    Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+  //Function to pick date
+  Future<void> _selectDate(BuildContext context) async {
+  final DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: DateTime.now(),
+    firstDate: DateTime(2000),
+    lastDate: DateTime(2101),
+  );
+  if (picked != null) {
+    // Display the selected date 
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
     );
-    if (picked != null) {
-      // Display the selected date using a dialog or Snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
+  }
+}
+
+// Function to pick time
+  Future<void> _selectTime(BuildContext context) async {
+  final TimeOfDay? pickedTime = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay.now(),
+  );
+  if (pickedTime != null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Selected Time: ${pickedTime.format(context)}')),
       );
     }
   }
@@ -63,14 +77,19 @@ class Add_Alert extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
+            TextField( //Title of the alert
               controller: _alertName,
               decoration: const InputDecoration(labelText: 'Title'),
             ),
-            const SizedBox(height: 16), // Space between input and button
-            ElevatedButton(
+            const SizedBox(height: 16), 
+            ElevatedButton( //Date selector
               onPressed: () => _selectDate(context),
               child: const Text('Select Date'),
+            ),
+            const SizedBox(height: 8), // Space between date and time button
+            ElevatedButton(
+              onPressed: () => _selectTime(context),
+              child: const Text('Select Time'),
             ),
           ],
         ),
