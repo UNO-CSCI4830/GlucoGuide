@@ -8,6 +8,14 @@ class AlertsPage extends StatefulWidget {
 }
 
 class _AlertsPageState extends State<AlertsPage> {
+  final List<Map<String, dynamic>> _alerts = []; // List to store alerts
+
+  // Function to add an alert to the list
+  void _addAlert(Map<String, dynamic> alert) {
+    setState(() {
+      _alerts.add(alert);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,15 +27,32 @@ class _AlertsPageState extends State<AlertsPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () {
-                // Navigate to Page1
-                Navigator.push(
+              onPressed: () async {
+                // Navigate to AddAlert page and wait for result
+                final newAlert = await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => Add_Alert()),
                 );
+                if (newAlert != null) {
+                  _addAlert(newAlert); // Add new alert to the list
+                }
               },
               child: const Text('Add New Alert'),
-            )
+            ),
+            const SizedBox(height: 20),
+            // Display the alerts
+            Expanded(
+              child: ListView.builder(
+                itemCount: _alerts.length,
+                itemBuilder: (context, index) {
+                  final alert = _alerts[index];
+                  return ListTile(
+                    title: Text(alert['title']),
+                    subtitle: Text('Date: ${alert['date']}, Time: ${alert['time']}'),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -39,6 +64,7 @@ class _AlertsPageState extends State<AlertsPage> {
 class Add_Alert extends StatelessWidget {
   Add_Alert({super.key});
   final _alertName = TextEditingController();
+  DateTime? selectedDate; //variable to hold user selected date
 
   //Function to pick date
   Future<void> _selectDate(BuildContext context) async {
@@ -49,9 +75,9 @@ class Add_Alert extends StatelessWidget {
     lastDate: DateTime(2101),
   );
   if (picked != null) {
-    // Display the selected date 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
+    selectedDate = picked; //Store the selected date
+    ScaffoldMessenger.of(context).showSnackBar( //Display message to show success
+        SnackBar(content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
     );
   }
 }
@@ -62,10 +88,15 @@ class Add_Alert extends StatelessWidget {
     context: context,
     initialTime: TimeOfDay.now(),
   );
-  if (pickedTime != null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('Selected Time: ${pickedTime.format(context)}')),
-      );
+  if (pickedTime != null && selectedDate != null) { //verifies both date and time are picked
+      final String formattedTime = pickedTime.format(context);
+      final Map<String, dynamic> alertData = {
+        'title': _alertName.text,
+        'date': selectedDate!.toLocal().toString().split(' ')[0], // Format the date
+        'time': formattedTime,
+      };
+
+      Navigator.pop(context, alertData); // Return the alert data to the previous page
     }
   }
   
