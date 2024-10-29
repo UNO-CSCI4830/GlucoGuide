@@ -6,45 +6,58 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // get current user
+
     final User? user = FirebaseAuth.instance.currentUser;
 
-    final String name = user?.displayName ?? "User";
+    final String name = user?.email.toString() ?? "User";
 
-    return Row(
-      children: [
-        const Text('GlucoGuide', style: TextStyle(fontSize: 16)),
-        const Spacer(), // Pushes the button to the right
-        PopupMenuButton<int>(
-          icon: const Icon(Icons.more_vert),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(8.0),
-              bottomLeft: Radius.circular(8.0),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home Page'),
+        backgroundColor: Color.fromARGB(147, 36, 185, 156),
+        actions: [
+          PopupMenuButton<int>(
+            icon: const Icon(Icons.more_vert),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8.0),
+                bottomLeft: Radius.circular(8.0),
+              ),
             ),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 1,
+                child: Text('Settings'),
+              ),
+              const PopupMenuItem(
+                value: 2,
+                child: Text('Other'),
+              ),
+            ],
+            onSelected: (value) {
+
+              if (value == 1) {
+                Navigator.pushNamed(context, '/app_settings');
+              } else if (value == 2) {
+
+              }
+            },
           ),
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 1,
-              child: const Text('Settings'),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+             Text(
+              'Welcome, $name!',
+              style: TextStyle(fontSize: 24),
             ),
-            PopupMenuItem(
-              value: 2,
-              child: const Text('Other'),
-            ),
+            const SizedBox(
+                height: 20), 
           ],
-          onSelected: (value) {
-            // Handle the selected option
-            if (value == 1) {
-              Navigator.pushNamed(context, '/app_settings');
-            } else if (value == 2) {
-              // Do something for option 2
-            } else if (value == 3) {
-              // Do something for option 3
-            }
-          },
         ),
-      ],
+      ),
     );
   }
 }
