@@ -39,7 +39,7 @@ class _AlertsPageState extends State<AlertsPage> {
                 // Navigate to AddAlert page and wait for result
                 final newAlert = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Add_Alert()),
+                  MaterialPageRoute(builder: (context) => AddAlert()),
                 );
                 if (newAlert != null) {
                   _addAlert(newAlert); // Add new alert to the list
@@ -80,11 +80,18 @@ class _AlertsPageState extends State<AlertsPage> {
   }
 }
 
+class AddAlert extends StatefulWidget{
+  const AddAlert({super.key});
+
+  @override
+  Add_Alert createState() => Add_Alert();
+}
+
 // Page to handle making new alerts
-class Add_Alert extends StatelessWidget {
-  Add_Alert({super.key});
-  final _alertName = TextEditingController();
+class Add_Alert extends State<AddAlert> {
+  final TextEditingController _alertName = TextEditingController();
   DateTime? selectedDate; //variable to hold user selected date
+  String? selectedTime;
 
   //Function to pick date
   Future<void> _selectDate(BuildContext context) async {
@@ -108,16 +115,12 @@ class Add_Alert extends StatelessWidget {
     context: context,
     initialTime: TimeOfDay.now(),
   );
-  if (pickedTime != null && selectedDate != null) { //verifies both date and time are picked
-      final String formattedTime = pickedTime.format(context);
-      final Map<String, dynamic> alertData = {
-        'title': _alertName.text,
-        'date': selectedDate!.toLocal().toString().split(' ')[0], // Format the date
-        'time': formattedTime,
-      };
-
-      Navigator.pop(context, alertData); // Return the alert data to the previous page
-    }
+  if(pickedTime != null){
+    setState((){
+      selectedTime = pickedTime.format(context);
+    },
+    );
+  }
   }
   
   @override
@@ -141,6 +144,20 @@ class Add_Alert extends StatelessWidget {
             ElevatedButton(
               onPressed: () => _selectTime(context),
               child: const Text('Select Time'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed:(){
+                if(selectedDate != null && selectedTime != null){
+                  final newAlert = {
+                    'title': _alertName.text,
+                    'date': selectedDate!.toLocal().toString().split(' ')[0],
+                    'time': selectedTime,
+                  };
+                  Navigator.pop(context, newAlert);
+                }
+              },
+              child: const Text('Save'),
             ),
           ],
         ),
