@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:glucoguide/components/bottom_navbar.dart';
 import 'package:glucoguide/screens/alerts/alerts_page.dart';
+import 'package:glucoguide/screens/app_settings/app_settings.dart';
 import 'package:glucoguide/screens/food_tracker/food_tracker.dart';
 import 'package:glucoguide/screens/home/home_page.dart';
 import 'package:glucoguide/screens/profile/profile.dart';

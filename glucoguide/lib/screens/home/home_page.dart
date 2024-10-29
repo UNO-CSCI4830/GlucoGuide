@@ -6,15 +6,53 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // get current user
     final User? user = FirebaseAuth.instance.currentUser;
 
-    final String name = user?.displayName ?? "User";
+    final String name = user?.email.toString() ?? "User";
 
-    return Center(
-      child: const Text(
-        "Welcome to GlucoGuide",
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home Page'),
+        automaticallyImplyLeading: false,
+        backgroundColor: Color.fromARGB(147, 36, 185, 156),
+        actions: [
+          PopupMenuButton<int>(
+            icon: const Icon(Icons.more_vert),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8.0),
+                bottomLeft: Radius.circular(8.0),
+              ),
+            ),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 1,
+                child: Text('Settings'),
+              ),
+              const PopupMenuItem(
+                value: 2,
+                child: Text('Other'),
+              ),
+            ],
+            onSelected: (value) {
+              if (value == 1) {
+                Navigator.pushNamed(context, '/app_settings');
+              } else if (value == 2) {}
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Welcome, $name!',
+              style: TextStyle(fontSize: 24),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
