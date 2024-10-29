@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:glucoguide/screens/app_settings/AccountSettingsPage.dart';
+import 'package:glucoguide/screens/app_settings/AboutUsPage.dart';
+import 'package:glucoguide/screens/app_settings/ChangePasswordPage.dart';
+import 'package:glucoguide/screens/app_settings/ContactSupportPage.dart';
+import 'package:glucoguide/screens/app_settings/DeleteAccountPage.dart';
+import 'package:glucoguide/screens/app_settings/EditProfilePage.dart';
 import 'package:glucoguide/screens/app_settings/NotificationSettingsPage.dart';
+import 'package:glucoguide/screens/app_settings/PrivacyCenterPage.dart';
+import 'package:glucoguide/screens/app_settings/PushNotificationPage.dart';
+import 'package:glucoguide/screens/app_settings/ReminderPage.dart';
 import 'package:glucoguide/screens/login/login_page.dart';
 
 class AppSettingsPage extends StatefulWidget {
@@ -21,17 +28,17 @@ class _MyAccountState extends State<AppSettingsPage> {
       SettingItem(
         title: 'Edit Profile',
         icon: Icons.manage_accounts,
-        nextPage: AccountSettingsPage(),
+        nextPage: EditProfilePage(),
       ),
       SettingItem(
         title: 'Delete Account',
         icon: Icons.delete,
-        nextPage: NotificationSettingsPage(),
+        nextPage: DeleteAccountPage(),
       ),
       SettingItem(
         title: 'Change Password',
         icon: Icons.lock_open,
-        nextPage: NotificationSettingsPage(),
+        nextPage: ChangePasswordPage(),
       ),
       SettingItem(
         title: 'Log Out',
@@ -47,17 +54,17 @@ class _MyAccountState extends State<AppSettingsPage> {
       SettingItem(
         title: 'Reminders',
         icon: Icons.event,
-        nextPage: NotificationSettingsPage(),
+        nextPage: ReminderPage(),
       ),
       SettingItem(
         title: 'Privacy Center',
         icon: Icons.lock,
-        nextPage: NotificationSettingsPage(),
+        nextPage: PrivacyCenterPage(),
       ),
       SettingItem(
         title: 'Push Notifications',
         icon: Icons.notifications,
-        nextPage: NotificationSettingsPage(),
+        nextPage: PushNotificationPage(),
       ),
       SettingItem(
         // Index = 9
@@ -67,12 +74,12 @@ class _MyAccountState extends State<AppSettingsPage> {
       SettingItem(
         title: 'About Us',
         icon: Icons.groups,
-        nextPage: NotificationSettingsPage(),
+        nextPage: AboutUsPage(),
       ),
       SettingItem(
         title: 'Contact Support',
         icon: Icons.contact_support,
-        nextPage: NotificationSettingsPage(),
+        nextPage: ContactSupportPage(),
       ),
     ];
 

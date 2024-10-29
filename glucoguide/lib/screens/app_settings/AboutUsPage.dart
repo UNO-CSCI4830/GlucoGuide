@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-class AccountSettingsPage extends StatelessWidget {
+class AboutUsPage extends StatelessWidget {
+  const AboutUsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account Settings'),
+        title: const Text('About Us'),
       ),
 
       // Account Settings page
       body: Center(
-        child: const Text('Account Settings'),
+        child: const Text('About Us'),
       ),
     );
   }
