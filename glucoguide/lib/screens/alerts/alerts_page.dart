@@ -16,6 +16,14 @@ class _AlertsPageState extends State<AlertsPage> {
       _alerts.add(alert);
     });
   }
+
+  // Function to update an alert in the list
+  void _updateAlert(int index, Map<String, dynamic> updatedAlert) {
+    setState(() {
+      _alerts[index] = updatedAlert;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,6 +57,18 @@ class _AlertsPageState extends State<AlertsPage> {
                   return ListTile(
                     title: Text(alert['title']),
                     subtitle: Text('Date: ${alert['date']}, Time: ${alert['time']}'),
+                    onTap: () async{
+                      //Navigate to edit_alert page and wait for input
+                      final updated_alert = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditAlert(alert: alert),
+                         ),
+                      );
+                      if(updated_alert != null){
+                        _updateAlert(index, updated_alert);
+                      }
+                    }
                   );
                 },
               ),
@@ -121,6 +141,101 @@ class Add_Alert extends StatelessWidget {
             ElevatedButton(
               onPressed: () => _selectTime(context),
               child: const Text('Select Time'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+//page to edit existing alert
+class EditAlert extends StatefulWidget{
+  final Map<String, dynamic> alert;
+  const EditAlert({required this.alert, super.key});
+
+  @override
+  edit_alert createState() => edit_alert();
+
+}
+
+class edit_alert extends State<EditAlert>{
+  late TextEditingController alert_name;
+  DateTime? selected_date;
+  String? selected_time;
+
+  @override
+  void initState(){
+    super.initState();
+    alert_name = TextEditingController(text: widget.alert['title']);
+    selected_date = DateTime.parse(widget.alert['date']);
+    selected_time = widget.alert['time'];
+  }
+
+   //Function to pick date
+  Future<void> _selectDate(BuildContext context) async {
+  final DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: selected_date ?? DateTime.now(),
+    firstDate: DateTime(2000),
+    lastDate: DateTime(2101),
+  );
+  if (picked != null) {
+    setState((){
+      selected_date = picked; //Store the selected date
+    });
+    ScaffoldMessenger.of(context).showSnackBar( //Display message to show success
+        SnackBar(content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
+    );
+  }
+}
+
+// Function to pick time
+  Future<void> _selectTime(BuildContext context) async {
+  final TimeOfDay? pickedTime = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay.now(),
+  );
+  if (pickedTime != null) { 
+      setState((){
+        selected_time = pickedTime.format(context);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Edit Alert')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: alert_name,
+              decoration: const InputDecoration(labelText: 'Title'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => _selectDate(context),
+              child: const Text('Select Date'),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () => _selectTime(context),
+              child: const Text('Select Time'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                final updatedAlert = {
+                  'title': alert_name.text,
+                  'date': selected_date!.toLocal().toString().split(' ')[0],
+                  'time': selected_time,
+                };
+                Navigator.pop(context, updatedAlert);
+              },
+              child: const Text('Save Changes'),
             ),
           ],
         ),
