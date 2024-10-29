@@ -20,7 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Center(child: const Text('Regsiter GlucoGuide Account')),
+          title: Center(child: const Text('Register GlucoGuide Account')),
           backgroundColor: Colors.white,
         ),
         body: Padding(
