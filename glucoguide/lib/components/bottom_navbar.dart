@@ -33,7 +33,7 @@ class BottomNavBar extends StatelessWidget {
           label: 'Alerts',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.fastfood),
+          icon: Icon(Icons.track_changes),
           label: 'Track',
         ),
       ],

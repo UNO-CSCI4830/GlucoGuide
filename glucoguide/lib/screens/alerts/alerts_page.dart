@@ -28,6 +28,7 @@ class _AlertsPageState extends State<AlertsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Alerts Page'),
       ),
       body: Center(
@@ -55,21 +56,21 @@ class _AlertsPageState extends State<AlertsPage> {
                 itemBuilder: (context, index) {
                   final alert = _alerts[index];
                   return ListTile(
-                    title: Text(alert['title']),
-                    subtitle: Text('Date: ${alert['date']}, Time: ${alert['time']}'),
-                    onTap: () async{
-                      //Navigate to edit_alert page and wait for input
-                      final updated_alert = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditAlert(alert: alert),
-                         ),
-                      );
-                      if(updated_alert != null){
-                        _updateAlert(index, updated_alert);
-                      }
-                    }
-                  );
+                      title: Text(alert['title']),
+                      subtitle: Text(
+                          'Date: ${alert['date']}, Time: ${alert['time']}'),
+                      onTap: () async {
+                        //Navigate to edit_alert page and wait for input
+                        final updated_alert = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditAlert(alert: alert),
+                          ),
+                        );
+                        if (updated_alert != null) {
+                          _updateAlert(index, updated_alert);
+                        }
+                      });
                 },
               ),
             ),
@@ -80,7 +81,7 @@ class _AlertsPageState extends State<AlertsPage> {
   }
 }
 
-class AddAlert extends StatefulWidget{
+class AddAlert extends StatefulWidget {
   const AddAlert({super.key});
 
   @override
@@ -95,34 +96,37 @@ class Add_Alert extends State<AddAlert> {
 
   //Function to pick date
   Future<void> _selectDate(BuildContext context) async {
-  final DateTime? picked = await showDatePicker(
-    context: context,
-    initialDate: DateTime.now(),
-    firstDate: DateTime(2000),
-    lastDate: DateTime(2101),
-  );
-  if (picked != null) {
-    selectedDate = picked; //Store the selected date
-    ScaffoldMessenger.of(context).showSnackBar( //Display message to show success
-        SnackBar(content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
     );
+    if (picked != null) {
+      selectedDate = picked; //Store the selected date
+      ScaffoldMessenger.of(context).showSnackBar(
+        //Display message to show success
+        SnackBar(
+            content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
+      );
+    }
   }
-}
 
 // Function to pick time
   Future<void> _selectTime(BuildContext context) async {
-  final TimeOfDay? pickedTime = await showTimePicker(
-    context: context,
-    initialTime: TimeOfDay.now(),
-  );
-  if(pickedTime != null){
-    setState((){
-      selectedTime = pickedTime.format(context);
-    },
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
     );
+    if (pickedTime != null) {
+      setState(
+        () {
+          selectedTime = pickedTime.format(context);
+        },
+      );
+    }
   }
-  }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,12 +135,14 @@ class Add_Alert extends State<AddAlert> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField( //Title of the alert
+            TextField(
+              //Title of the alert
               controller: _alertName,
               decoration: const InputDecoration(labelText: 'Title'),
             ),
-            const SizedBox(height: 16), 
-            ElevatedButton( //Date selector
+            const SizedBox(height: 16),
+            ElevatedButton(
+              //Date selector
               onPressed: () => _selectDate(context),
               child: const Text('Select Date'),
             ),
@@ -147,8 +153,8 @@ class Add_Alert extends State<AddAlert> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed:(){
-                if(selectedDate != null && selectedTime != null){
+              onPressed: () {
+                if (selectedDate != null && selectedTime != null) {
                   final newAlert = {
                     'title': _alertName.text,
                     'date': selectedDate!.toLocal().toString().split(' ')[0],
@@ -167,54 +173,55 @@ class Add_Alert extends State<AddAlert> {
 }
 
 //page to edit existing alert
-class EditAlert extends StatefulWidget{
+class EditAlert extends StatefulWidget {
   final Map<String, dynamic> alert;
   const EditAlert({required this.alert, super.key});
 
   @override
   edit_alert createState() => edit_alert();
-
 }
 
-class edit_alert extends State<EditAlert>{
+class edit_alert extends State<EditAlert> {
   late TextEditingController alert_name;
   DateTime? selected_date;
   String? selected_time;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     alert_name = TextEditingController(text: widget.alert['title']);
     selected_date = DateTime.parse(widget.alert['date']);
     selected_time = widget.alert['time'];
   }
 
-   //Function to pick date
+  //Function to pick date
   Future<void> _selectDate(BuildContext context) async {
-  final DateTime? picked = await showDatePicker(
-    context: context,
-    initialDate: selected_date ?? DateTime.now(),
-    firstDate: DateTime(2000),
-    lastDate: DateTime(2101),
-  );
-  if (picked != null) {
-    setState((){
-      selected_date = picked; //Store the selected date
-    });
-    ScaffoldMessenger.of(context).showSnackBar( //Display message to show success
-        SnackBar(content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selected_date ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
     );
+    if (picked != null) {
+      setState(() {
+        selected_date = picked; //Store the selected date
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        //Display message to show success
+        SnackBar(
+            content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
+      );
+    }
   }
-}
 
 // Function to pick time
   Future<void> _selectTime(BuildContext context) async {
-  final TimeOfDay? pickedTime = await showTimePicker(
-    context: context,
-    initialTime: TimeOfDay.now(),
-  );
-  if (pickedTime != null) { 
-      setState((){
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (pickedTime != null) {
+      setState(() {
         selected_time = pickedTime.format(context);
       });
     }
@@ -247,7 +254,7 @@ class edit_alert extends State<EditAlert>{
                 return null;
               },
               child: const Text('Delete'),
-              ),
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {

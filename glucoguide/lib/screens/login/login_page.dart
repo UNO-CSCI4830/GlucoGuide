@@ -19,7 +19,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Center(child: const Text('Gluco Guide Login'))),
+      appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Center(child: const Text('Gluco Guide Login'))),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
