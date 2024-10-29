@@ -242,6 +242,12 @@ class edit_alert extends State<EditAlert>{
               onPressed: () => _selectTime(context),
               child: const Text('Select Time'),
             ),
+            ElevatedButton(
+              onPressed: () {
+                return null;
+              },
+              child: const Text('Delete'),
+              ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -254,6 +260,7 @@ class edit_alert extends State<EditAlert>{
               },
               child: const Text('Save Changes'),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
