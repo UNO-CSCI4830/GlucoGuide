@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glucoguide/widgets/insulin_calculator.dart';
 
 class FoodTrackerPage extends StatefulWidget {
   const FoodTrackerPage({super.key});
@@ -10,6 +11,7 @@ class FoodTrackerPage extends StatefulWidget {
 class _FoodTrackerPageState extends State<FoodTrackerPage> {
   @override
   Widget build(BuildContext context) {
+    InsulinDoseCalculator();
     return const Placeholder();
   }
 }
