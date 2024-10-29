@@ -33,4 +33,43 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
           ((glucose - targetGlucose) / sensitivityFactor) + (carbs / carbRatio);
     });
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextField(
+          controller: glucoseController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(labelText: 'Blood Glucose (mg/dL)'),
+        ),
+        TextField(
+          controller: carbsController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(labelText: 'Carbs (g)'),
+        ),
+        TextField(
+          controller: sensitivityFactorController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(labelText: 'Sensitivity Factor'),
+        ),
+        TextField(
+          controller: carbRatioController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(labelText: 'Carb Ratio'),
+        ),
+        TextField(
+          controller: targetGlucoseController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(labelText: 'Target Glucose (mg/dL)'),
+        ),
+        ElevatedButton(
+          onPressed: calculateDose,
+          child: const Text('Calculate Dose'),
+        ),
+        if (insulinDose > 0)
+          Text('Dose: ${insulinDose.toStringAsFixed(2)} units'),
+      ],
+    );
+  }
 }
