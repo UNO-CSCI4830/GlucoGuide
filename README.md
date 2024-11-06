@@ -126,4 +126,4 @@ There are some commands that are good to know:
 - ``` git fetch ``` - grabs the data from the repo, to check for any updates
 - ``` git diff ``` - checks for the differences between files on the local compared to the repo in the terminal
 - ``` git checkout ``` - allows you to travel between the different local branchs
-- ``` git pull --set-upstream origin <target_branch>``` - sets up a connection between different repo branches and the local branch your in. This is used for pushing and pulling.
+- ``` git pull --set-upstream origin <target_branch> ``` - sets up a connection between different repo branches and the local branch your in. This is used for pushing and pulling.
