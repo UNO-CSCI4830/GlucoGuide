@@ -22,6 +22,18 @@ git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 ```
 
+There might also be an issue when configering, the solution will be to go to this url [Git Settings](https://github.com/settings/tokens). Make a token with full commands /(You dont always want to do this, but for these purposes you should/).
+Copy the generated token, and type what is below in the terminal. This will set-up a connection to repo. 
+
+```bash
+#clone the repo
+git clone https://github.com/UNO-CSCI4830/GlucoGuide.git
+#go into the repo
+cd GlucoGuide
+#This is the format: git remote set-url origin https://<username>:<generated_token>@github.com/<ORG>/<repo>.git
+git remote set-url origin https://<username>:<generated_token>@github.com/UNO-CSCI4830/GlucoGuide.git
+```
+
 ---
 
 ### Branching 
