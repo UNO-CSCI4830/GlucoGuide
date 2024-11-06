@@ -22,7 +22,7 @@ git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 ```
 
-There might also be an issue when configering, the solution will be to go to this url [Git Settings](https://github.com/settings/tokens). Make a token with full commands /(You dont always want to do this, but for these purposes you should/).
+There might also be an issue when configering, the solution will be to go to this url [Git Settings](https://github.com/settings/tokens). Make a token with full commands (You dont always want to do this, but for these purposes you should).
 Copy the generated token, and type what is below in the terminal. This will set-up a connection to repo. 
 
 ```bash
@@ -122,8 +122,8 @@ When doing this and it still doesn't work add ``` --hard ``` to the end for a fo
 ### Helpful Commands
 
 There are some commands that are good to know:
-``` git status ``` - checks the if there are changes on your local branch compared to the repo branch
-``` git fetch ``` - grabs the data from the repo, to check for any updates
-``` git diff ``` - checks for the differences between files on the local compared to the repo in the terminal
-``` git checkout ``` - allows you to travel between the different local branchs
-``` git pull --set-upstream origin <target_branch>``` - sets up a connection between different repo branches and the local branch your in. This is used for pushing and pulling.
+- ``` git status ``` - checks the if there are changes on your local branch compared to the repo branch
+- ``` git fetch ``` - grabs the data from the repo, to check for any updates
+- ``` git diff ``` - checks for the differences between files on the local compared to the repo in the terminal
+- ``` git checkout ``` - allows you to travel between the different local branchs
+- ``` git pull --set-upstream origin <target_branch>``` - sets up a connection between different repo branches and the local branch your in. This is used for pushing and pulling.
