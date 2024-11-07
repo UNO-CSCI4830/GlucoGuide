@@ -127,3 +127,54 @@ There are some commands that are good to know:
 - ``` git diff ``` - checks for the differences between files on the local compared to the repo in the terminal
 - ``` git checkout ``` - allows you to travel between the different local branchs
 - ``` git pull --set-upstream origin <target_branch> ``` - sets up a connection between different repo branches and the local branch your in. This is used for pushing and pulling.
+
+---
+
+# Gluco Guide - API Calls
+
+This document serves as a quick reference for API Calls using Flutter/Dart.
+
+---
+
+## Table of Contents
+1. [Setup for FoodData Central](#setup-fooddata-central)
+2. [GET Requests with FoodData Central](#get-requests-with-fooddata-central)
+3. [POST Requests with FoodData Central](#post-requests-with-fooddata-central)
+---
+
+### Setup FoodData Central
+
+Before you are able to start doing API request, you need to generate an API key:
+
+1. Go to this [Food Database Website.](https://fdc.nal.usda.gov/api-guide.html)
+2. From there you need to [sign up](https://fdc.nal.usda.gov/api-key-signup.html) to obtain an API Key with FoodData Central. Its a Government ran website, and you will need to use First/Last Name with a valid Email.
+
+**Note: There is a limit to 1000 API calls per IP**
+
+3. This will send you an email with an API Key. That will be used to make queries/calls to the Database
+
+---
+
+### GET Requests with Fooddata Central
+
+Due to Flutter being a framework based off the Dart coding languages, our main API calls will use dart. Here are a few API calls that will be used in the application.  
+
+To retrieve a list of foods use the endpoint ```/foods/lists``` as follows:
+```dart
+//Lists the request
+var request = http.Request(
+    'GET', Uri.parse('https://api.nal.usda.gov/fdc/v1/foods/list?api_key=<API_KEY>));
+
+//Waits for the response
+http.StreamedResponse response = await request.send();
+
+//Stores the request in response.stream.bytesToString() as a JSON
+if (response.statusCode == 200) {
+  print(await response.stream.bytesToString());
+}
+else {
+  print(response.reasonPhrase);
+}
+
+```
+\- "Will finish later" -bagel
