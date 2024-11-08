@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:glucoguide/models/user_profile.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -11,6 +13,8 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _dateOfBirthController = TextEditingController();
+  String? _selectedGender;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -38,11 +42,32 @@ class _RegisterPageState extends State<RegisterPage> {
                 decoration: const InputDecoration(labelText: "Create Password"),
                 obscureText: true,
               ),
+              TextField(
+                controller: _dateOfBirthController,
+                decoration: const InputDecoration(
+                    labelText: "Date of Birth (MON-DD-YYYY)"),
+              ),
+              DropdownButtonFormField<String>(
+                  value: _selectedGender,
+                  decoration: const InputDecoration(labelText: "Gender"),
+                  items: ['Male', 'Female', 'Other']
+                      .map((gender) => DropdownMenuItem(
+                            value: gender,
+                            child: Text(gender),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedGender = value;
+                    });
+                  }),
+
               const SizedBox(height: 20),
               ElevatedButton(
                   onPressed: _registerUser, child: const Text('Register')),
               const SizedBox(height: 20),
-              // Step 6: Display registration status
+
+              // Display status of registration
               Text(_status),
             ],
           ),
@@ -56,6 +81,23 @@ class _RegisterPageState extends State<RegisterPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
+      final userProfile = UserProfile(
+          uid: userCredential.user!.uid,
+          email: _emailController.text.trim(),
+          name: '',
+          dateOfBirth: _dateOfBirthController.text.trim(),
+          gender: '',
+          height: 5,
+          weight: 5,
+          country: '',
+          unit: '');
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set(userProfile.toMap());
+
       setState(() {
         _status = 'Registered as: ${userCredential.user?.email}';
       });
@@ -65,5 +107,18 @@ class _RegisterPageState extends State<RegisterPage> {
         _status = 'Registration Error: $e';
       });
     }
+  }
+
+  @override
+  void dispose() {
+    // Dispose of all controllers to free resources
+    _emailController.dispose();
+    _passwordController.dispose();
+    // _nameController.dispose();
+    _dateOfBirthController.dispose();
+    // _heightController.dispose();
+    // _weightController.dispose();
+    // _countryController.dispose();
+    super.dispose();
   }
 }
