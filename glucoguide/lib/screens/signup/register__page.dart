@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:glucoguide/models/user_profile.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -13,65 +14,111 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
   final _dateOfBirthController = TextEditingController();
+  final _countryController = TextEditingController();
+  final _heightController = TextEditingController();
+  final _weightController = TextEditingController();
   String? _selectedGender;
+  String? _selectedUnit;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  String _status = ''; // Status message to display registration result
+  String _status = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Center(child: const Text('Regsiter GlucoGuide Account')),
-          backgroundColor: Colors.white,
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
+      appBar: AppBar(
+        title: const Text('Register Account'),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: "Email"),
-                keyboardType: TextInputType.emailAddress,
+              _buildTextField(_nameController, "Full Name"),
+              _buildTextField(
+                  _emailController, "Email", TextInputType.emailAddress),
+              _buildTextField(_passwordController, "Password"),
+              GestureDetector(
+                onTap: _pickDateOfBirth,
+                child: AbsorbPointer(
+                  child: _buildTextField(
+                      _dateOfBirthController, "Date of Birth (YYYY-MM-DD)"),
+                ),
               ),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: "Create Password"),
-                obscureText: true,
-              ),
-              TextField(
-                controller: _dateOfBirthController,
-                decoration: const InputDecoration(
-                    labelText: "Date of Birth (MON-DD-YYYY)"),
-              ),
-              DropdownButtonFormField<String>(
-                  value: _selectedGender,
-                  decoration: const InputDecoration(labelText: "Gender"),
-                  items: ['Male', 'Female', 'Other']
-                      .map((gender) => DropdownMenuItem(
-                            value: gender,
-                            child: Text(gender),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGender = value;
-                    });
-                  }),
-
+              _buildDropdownField("Gender", ["Male", "Female", "Other"],
+                  (value) => setState(() => _selectedGender = value)),
+              _buildDropdownField("Weight Unit", ["kg", "lbs"],
+                  (value) => setState(() => _selectedUnit = value)),
+              _buildTextField(
+                  _heightController, "Height (cm)", TextInputType.number),
+              _buildTextField(
+                  _weightController, "Weight", TextInputType.number),
+              _buildTextField(_countryController, "Country"),
               const SizedBox(height: 20),
               ElevatedButton(
-                  onPressed: _registerUser, child: const Text('Register')),
+                onPressed: _registerUser,
+                child: const Text("Register"),
+              ),
               const SizedBox(height: 20),
-
-              // Display status of registration
-              Text(_status),
+              Text(_status,
+                  style: TextStyle(
+                      color: _status.contains("Error")
+                          ? Colors.red
+                          : Colors.green)),
             ],
           ),
-        ));
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label,
+      [TextInputType keyboardType = TextInputType.text,
+      bool obscureText = false]) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownField(
+      String label, List<String> items, ValueChanged<String?> onChanged) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: DropdownButtonFormField<String>(
+        decoration:
+            InputDecoration(labelText: label, border: OutlineInputBorder()),
+        items: items
+            .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+            .toList(),
+        onChanged: onChanged,
+      ),
+    );
+  }
+
+  Future<void> _pickDateOfBirth() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        _dateOfBirthController.text = "${pickedDate.toLocal()}".split(' ')[0];
+      });
+    }
   }
 
   Future<void> _registerUser() async {
@@ -83,15 +130,16 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       final userProfile = UserProfile(
-          uid: userCredential.user!.uid,
-          email: _emailController.text.trim(),
-          name: '',
-          dateOfBirth: _dateOfBirthController.text.trim(),
-          gender: '',
-          height: 5,
-          weight: 5,
-          country: '',
-          unit: '');
+        uid: userCredential.user!.uid,
+        email: _emailController.text.trim(),
+        name: _nameController.text.trim(),
+        dateOfBirth: _dateOfBirthController.text.trim(),
+        gender: _selectedGender ?? '',
+        height: int.parse(_heightController.text.trim()),
+        weight: int.parse(_weightController.text.trim()),
+        country: _countryController.text.trim(),
+        unit: _selectedUnit ?? '',
+      );
 
       await FirebaseFirestore.instance
           .collection('users')
@@ -101,7 +149,7 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() {
         _status = 'Registered as: ${userCredential.user?.email}';
       });
-      Navigator.pushReplacementNamed(context, '/login'); // Go to home page
+      Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
       setState(() {
         _status = 'Registration Error: $e';
@@ -111,14 +159,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
-    // Dispose of all controllers to free resources
     _emailController.dispose();
     _passwordController.dispose();
-    // _nameController.dispose();
+    _nameController.dispose();
     _dateOfBirthController.dispose();
-    // _heightController.dispose();
-    // _weightController.dispose();
-    // _countryController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
+    _countryController.dispose();
     super.dispose();
   }
 }
