@@ -157,6 +157,8 @@ Before you are able to start doing API request, you need to generate an API key:
 
 ### GET Requests with Fooddata Central
 
+**Note: Data Gathered from [FoodData Central](https://fdc.nal.usda.gov/api-spec/fdc_api.html)**
+
 Due to Flutter being a framework based off the Dart coding languages, our main API calls will use dart. Here are a few API calls that will be used in the application.  
 
 To retrieve a list of foods use the endpoint ```/foods/lists``` as follows:
@@ -177,4 +179,23 @@ else {
 }
 
 ```
-\- "Will finish later" -bagel
+
+Now lets take a look at Search Query. You can search for foods using the **GET** Request: ```https://api.nal.usda.gov/fdc/v1/foods/search?```. Here are the following parameters:
+
+- ```query``` - **String:* The Food you are searching for.
+  - Example use case: ```cheddar cheese```
+
+
+```dart
+var request = http.Request('GET', Uri.parse('https://api.nal.usda.gov/fdc/v1/foods/search?api_key=<API_KEY>&query=<food_item>&pageSize=<Number>&brandOwner=<Brand Name>&pageNumber=<Number>'));
+
+
+http.StreamedResponse response = await request.send();
+
+if (response.statusCode == 200) {
+  print(await response.stream.bytesToString());
+}
+else {
+  print(response.reasonPhrase);
+}
+```
