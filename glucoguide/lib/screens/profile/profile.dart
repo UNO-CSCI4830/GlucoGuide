@@ -13,6 +13,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.blue,
         title: Text("Profile Page"),
       ),
     );

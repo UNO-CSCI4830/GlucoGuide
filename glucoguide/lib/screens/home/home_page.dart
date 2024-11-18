@@ -6,7 +6,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final User? user = FirebaseAuth.instance.currentUser;
 
     final String name = user?.email.toString() ?? "User";
@@ -14,6 +13,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home Page'),
+        automaticallyImplyLeading: false,
         backgroundColor: Color.fromARGB(147, 36, 185, 156),
         actions: [
           PopupMenuButton<int>(
@@ -35,12 +35,9 @@ class HomePage extends StatelessWidget {
               ),
             ],
             onSelected: (value) {
-
               if (value == 1) {
                 Navigator.pushNamed(context, '/app_settings');
-              } else if (value == 2) {
-
-              }
+              } else if (value == 2) {}
             },
           ),
         ],
@@ -49,12 +46,11 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-             Text(
+            Text(
               'Welcome, $name!',
               style: TextStyle(fontSize: 24),
             ),
-            const SizedBox(
-                height: 20), 
+            const SizedBox(height: 20),
           ],
         ),
       ),

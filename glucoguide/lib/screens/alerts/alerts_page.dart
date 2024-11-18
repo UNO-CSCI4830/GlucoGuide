@@ -28,6 +28,7 @@ class _AlertsPageState extends State<AlertsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.red,
         automaticallyImplyLeading: false,
         title: const Text('Alerts Page'),
       ),
