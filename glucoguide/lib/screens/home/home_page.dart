@@ -16,6 +16,16 @@ class HomePage extends StatelessWidget {
         automaticallyImplyLeading: false,
         backgroundColor: Color.fromARGB(147, 36, 185, 156),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.file_download),
+            tooltip: 'Export',
+            onPressed: () {
+              // Will implement functionality here in the future
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Export button pressed!')),
+              );
+            },
+          ),
           PopupMenuButton<int>(
             icon: const Icon(Icons.more_vert),
             shape: const RoundedRectangleBorder(
