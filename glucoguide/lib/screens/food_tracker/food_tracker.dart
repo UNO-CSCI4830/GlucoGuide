@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:glucoguide/components/insulin_calculator.dart';
+import 'package:glucoguide/widgets/insulin_calculator.dart';
 
 class FoodTrackerPage extends StatefulWidget {
   const FoodTrackerPage({super.key});
@@ -13,7 +13,8 @@ class _FoodTrackerPageState extends State<FoodTrackerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tracker'),
+        title: const Text('Tracking'),
+        backgroundColor: Colors.green,
         automaticallyImplyLeading: false,
       ),
       body: Padding(
