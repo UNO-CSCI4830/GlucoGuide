@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:glucoguide/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -11,21 +13,20 @@ class EditProfilePage extends StatefulWidget {
 class _MyAccountState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
-    final User? user = FirebaseAuth.instance.currentUser;
-
-    final String name = user?.email.toString() ?? "User";
+    final userProfile = Provider.of<UserProvider>(context).userProfile;
 
     final List<EditProfileItems> settings = [
-      EditProfileItems(title: 'User Name', text: '[Username Here]'),
+      EditProfileItems(title: 'User Name', text: userProfile!.name),
       EditProfileItems(title: 'Profile Photo', text: '', icon: Icons.person),
-      EditProfileItems(title: 'Height', text: '[Height Here]'),
-      EditProfileItems(title: 'Sex', text: '[Sex Here]'),
-      EditProfileItems(title: 'Date of Birth', text: '[Date of Birth Here]'),
-      EditProfileItems(title: 'Location', text: '[Location Here]'),
-      EditProfileItems(title: 'Units', text: '[Units Here]'),
+      EditProfileItems(
+          title: 'Height', text: (userProfile.height).toString() + ' cm'),
+      EditProfileItems(title: 'Sex', text: userProfile.gender),
+      EditProfileItems(title: 'Date of Birth', text: userProfile.dateOfBirth),
+      EditProfileItems(title: 'Location', text: userProfile.country),
+      EditProfileItems(title: 'Units', text: userProfile.unit),
       EditProfileItems(
         title: 'Email',
-        text: name,
+        text: userProfile.email,
       )
     ];
 
