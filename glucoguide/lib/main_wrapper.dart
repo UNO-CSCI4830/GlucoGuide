@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:glucoguide/components/bottom_navbar.dart';
 import 'package:glucoguide/screens/alerts/alerts_page.dart';
