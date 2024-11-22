@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:glucoguide/main_wrapper.dart';
+import 'package:glucoguide/models/user_profile.dart';
 import 'package:glucoguide/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
