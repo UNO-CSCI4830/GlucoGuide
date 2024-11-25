@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:glucoguide/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class InsulinDoseCalculator extends StatefulWidget {
   const InsulinDoseCalculator({super.key});
@@ -18,6 +20,14 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
       TextEditingController(text: '100');
 
   double insulinDose = 0.0;
+  bool canCalculateDose = false;
+
+  void updateButtonState() {
+    setState(() {
+      canCalculateDose =
+          glucoseController.text.isNotEmpty && carbsController.text.isNotEmpty;
+    });
+  }
 
   void calculateDose() {
     final glucose = double.tryParse(glucoseController.text) ?? 0.0;
@@ -32,6 +42,26 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
       insulinDose =
           ((glucose - targetGlucose) / sensitivityFactor) + (carbs / carbRatio);
     });
+
+    // Log the dose in a Map<String, dynamic> so it fits in the db
+    // list properly, all logs will be the same way, and alerts.
+    final insulinDoseLog = {
+      'time': DateTime.now().toString(),
+      'dosage': insulinDose,
+      'bloodGlucLevel': glucose,
+      'note': 'test dose'
+    };
+
+    // update user profile via user provider
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // get current insulin dose logs and append the new log
+    final currentLogs = List<Map<String, dynamic>>.from(
+        userProvider.userProfile?.insulinDoseLogs ?? []);
+    currentLogs.add(insulinDoseLog);
+
+    // update userProfile
+    userProvider.updateUserProfile({'insulinDoseLogs': currentLogs});
   }
 
   @override
@@ -42,11 +72,13 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
           controller: glucoseController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(labelText: 'Blood Glucose (mg/dL)'),
+          onChanged: (value) => updateButtonState(),
         ),
         TextField(
           controller: carbsController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(labelText: 'Carbs (g)'),
+          onChanged: (value) => updateButtonState(),
         ),
         TextField(
           controller: sensitivityFactorController,
@@ -64,7 +96,7 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
           decoration: InputDecoration(labelText: 'Target Glucose (mg/dL)'),
         ),
         ElevatedButton(
-          onPressed: calculateDose,
+          onPressed: canCalculateDose ? calculateDose : null,
           child: const Text('Calculate Dose'),
         ),
         if (insulinDose > 0)

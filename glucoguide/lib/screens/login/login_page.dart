@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:glucoguide/main_wrapper.dart';
+import 'package:glucoguide/models/user_profile.dart';
+import 'package:glucoguide/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -61,9 +64,12 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      setState(() {
-        _status = 'Signed in as: ${userCredential.user?.email}';
-      });
+
+      // Load the user profile into the provider
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      await userProvider.loadUserProfile(userCredential.user!.uid);
+
+      // Navigate to MainWrapper
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const MainWrapper()),

@@ -1,14 +1,24 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:glucoguide/main_wrapper.dart';
+import 'package:glucoguide/providers/user_provider.dart';
 import 'package:glucoguide/screens/app_settings/app_settings.dart';
 import 'package:glucoguide/screens/login/login_page.dart';
 import 'package:glucoguide/screens/signup/register__page.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase
-  runApp(const MyApp());
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

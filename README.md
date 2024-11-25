@@ -137,58 +137,59 @@ This document serves as a quick reference for API Calls using Flutter/Dart.
 ---
 
 ## Table of Contents
-1. [Setup for FoodData Central](#setup-fooddata-central)
-2. [GET Requests with FoodData Central](#get-requests-with-fooddata-central)
-3. [POST Requests with FoodData Central](#post-requests-with-fooddata-central)
+1. [Setup for Nutritionix](#setup-nutritionix)
+2. [GET Requests with Nutritionix](#get-requests-with-fooddata-central)
+3. [POST Requests with Nutritionix](#post-requests-with-fooddata-central)
 ---
 
-### Setup FoodData Central
+### Setup Nutritionix
 
 Before you are able to start doing API request, you need to generate an API key:
 
-1. Go to this [Food Database Website.](https://fdc.nal.usda.gov/api-guide.html)
-2. From there you need to [sign up](https://fdc.nal.usda.gov/api-key-signup.html) to obtain an API Key with FoodData Central. Its a Government ran website, and you will need to use First/Last Name with a valid Email.
-
-**Note: There is a limit to 1000 API calls per IP**
-
-3. This will send you an email with an API Key. That will be used to make queries/calls to the Database
+1. ** Changed Food Resource. Will Update later  **
 
 ---
 
-### GET Requests with Fooddata Central
+### GET Requests with Nutritionix
 
-**Note: Data Gathered from [FoodData Central](https://fdc.nal.usda.gov/api-spec/fdc_api.html)**
+**Note: Data Gathered from [Nutritionix](https://docx.syndigo.com/developers/docs/nutritionix-api-guide)**
 
 Due to Flutter being a framework based off the Dart coding languages, our main API calls will use dart. Here are a few API calls that will be used in the application.  
 
-To retrieve a list of foods use the endpoint ```/foods/lists``` as follows:
-```dart
-//Lists the request
-var request = http.Request(
-    'GET', Uri.parse('https://api.nal.usda.gov/fdc/v1/foods/list?api_key=<API_KEY>));
+List of API CALLs for later --> Nutritionix
 
-//Waits for the response
+**Search Food**
+```dart
+var headers = {
+  'X-APP-ID': '<APP_ID>',
+  'X-APP-KEY': '<APP_Key>',
+  'query': 'cheese'
+};
+var request = http.Request('GET', Uri.parse('https://trackapi.nutritionix.com/v2/search/instant?query=<food_Item>'));
+
+request.headers.addAll(headers);
+
 http.StreamedResponse response = await request.send();
 
-//Stores the request in response.stream.bytesToString() as a JSON
 if (response.statusCode == 200) {
   print(await response.stream.bytesToString());
 }
 else {
   print(response.reasonPhrase);
-}
 
+}
 ```
 
-Now lets take a look at Search Query. You can search for foods using the **GET** Request: ```https://api.nal.usda.gov/fdc/v1/foods/search?```. Here are the following parameters:
-
-- ```query``` - **String:* The Food you are searching for.
-  - Example use case: ```cheddar cheese```
-
-
+**Search Item from Food**
 ```dart
-var request = http.Request('GET', Uri.parse('https://api.nal.usda.gov/fdc/v1/foods/search?api_key=<API_KEY>&query=<food_item>&pageSize=<Number>&brandOwner=<Brand Name>&pageNumber=<Number>'));
+var headers = {
+  'X-APP-ID': '<APP_ID>',
+  'X-APP-KEY': '<APP_Key>',
+  'query': 'cheese'
+};
+var request = http.Request('GET', Uri.parse('https://trackapi.nutritionix.com/v2/search/item?nix_item_id=<id_from_food_search>'));
 
+request.headers.addAll(headers);
 
 http.StreamedResponse response = await request.send();
 
@@ -197,5 +198,6 @@ if (response.statusCode == 200) {
 }
 else {
   print(response.reasonPhrase);
+
 }
 ```
