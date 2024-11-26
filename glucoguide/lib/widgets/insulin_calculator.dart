@@ -52,7 +52,7 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
       'note': 'test dose'
     };
 
-    // update user profile via user provider
+    // instantiate userprovider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     // get current insulin dose logs and append the new log
