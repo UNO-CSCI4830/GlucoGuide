@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../summary/summary.dart'; // Import the SummaryPage
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,7 +15,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Home Page'),
         automaticallyImplyLeading: false,
-        backgroundColor: Color.fromARGB(147, 36, 185, 156),
+        backgroundColor: const Color.fromARGB(147, 36, 185, 156),
         actions: [
           PopupMenuButton<int>(
             icon: const Icon(Icons.more_vert),
@@ -37,7 +38,7 @@ class HomePage extends StatelessWidget {
             onSelected: (value) {
               if (value == 1) {
                 Navigator.pushNamed(context, '/app_settings');
-              } else if (value == 2) {}
+              }
             },
           ),
         ],
@@ -48,9 +49,18 @@ class HomePage extends StatelessWidget {
           children: [
             Text(
               'Welcome, $name!',
-              style: TextStyle(fontSize: 24),
+              style: const TextStyle(fontSize: 24),
             ),
             const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SummaryPage()),
+                );
+              },
+              child: const Text('Go to Summary'),
+            ),
           ],
         ),
       ),
