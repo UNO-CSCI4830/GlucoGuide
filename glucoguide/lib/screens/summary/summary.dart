@@ -15,7 +15,7 @@ class SummaryPage extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Expanded(
-              child: chartToRun(), // Displays the chart
+              child: chartToRun(), // Shows the chart
             ),
           ],
         ),
@@ -30,10 +30,10 @@ class SummaryPage extends StatelessWidget {
     // Shows Data
     var chartData = ChartData(
       dataRows: [
-        [10.0, 20.0, 30.0, 40.0, 50.0], // Data for the first line
-        [15.0, 25.0, 35.0, 45.0, 55.0], // Data for the second line
+        [10.0, 20.0, 30.0, 40.0, 50.0], // Data for line 1
+        [15.0, 25.0, 35.0, 45.0, 55.0], // Data for line 2
       ],
-      xUserLabels: ["Jan", "Feb", "Mar", "Apr", "May"], // X-axis labels
+      xUserLabels: ["Jan", "Feb", "Mar", "Apr", "May"], // X-axis
       dataRowsLegends: ["Line 1", "Line 2"], // Legends for the lines
       chartOptions: chartOptions, // Chart configuration options
     );
@@ -48,7 +48,7 @@ class SummaryPage extends StatelessWidget {
       lineChartContainer: lineChartContainer,
     );
 
-    // Return the LineChart widget with the painter
+    // Return the LineChart widget
     return LineChart(
       painter: lineChartPainter,
       size: const Size(400, 300), // Size of chart
