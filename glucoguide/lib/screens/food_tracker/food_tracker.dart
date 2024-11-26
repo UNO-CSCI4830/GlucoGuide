@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glucoguide/widgets/insulin_calculator.dart';
+import 'package:glucoguide/widgets/food_search.dart';
 
 class FoodTrackerPage extends StatefulWidget {
   const FoodTrackerPage({super.key});
@@ -24,6 +25,8 @@ class _FoodTrackerPageState extends State<FoodTrackerPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
               InsulinDoseCalculator(),
+              SizedBox(height: 20),
+              FoodSearch(),
             ],
           ),
         ),
