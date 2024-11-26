@@ -15,7 +15,7 @@ class SummaryPage extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Expanded(
-              child: chartToRun(), // Display the chart widget
+              child: chartToRun(), // Displays the chart
             ),
           ],
         ),
@@ -24,10 +24,10 @@ class SummaryPage extends StatelessWidget {
   }
 
   Widget chartToRun() {
-    // Define the chart options
+    // Shows Options
     var chartOptions = ChartOptions();
 
-    // Define the chart data
+    // Shows Data
     var chartData = ChartData(
       dataRows: [
         [10.0, 20.0, 30.0, 40.0, 50.0], // Data for the first line
@@ -51,7 +51,7 @@ class SummaryPage extends StatelessWidget {
     // Return the LineChart widget with the painter
     return LineChart(
       painter: lineChartPainter,
-      size: const Size(400, 300), // Provide a size for the chart
+      size: const Size(400, 300), // Size of chart
     );
   }
 }
