@@ -71,4 +71,4 @@ jobs:
       - name: Build GlucoGuide Application
         run: |
           cd glucoguide
-          flutter build apk --release
+          flutter run
