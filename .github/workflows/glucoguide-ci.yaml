@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - shane
+      - main
 jobs:
   test_glucoguide:
     name: Testing Flutter Code
@@ -22,7 +23,7 @@ jobs:
       #3. Grabbed from https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz >> on same page as above
       - name: Install Flutter SDK
         run: |
-          curl -o fluter_linux.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && where flutter_linux.tar.xz && tar -xf flutter_linux.tar.xz && echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
+          curl -o fluter_linux.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && tar -xf flutter_linux.tar.xz && echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
       #4. Check Version of Flutter
       - name: Check Flutter Version
         run: flutter --version
@@ -46,12 +47,12 @@ jobs:
       #2. Grabbed from the documentation on https://docs.flutter.dev/get-started/install/linux/web
       - name: Install Flutter Development tools
         run: |
-          sudo apt-get update -y && sudo apt-get upgrade -y
-          sudo apt-get install -y curl git unzip xz-utils zip libglu1-mesa
+          sudo apt-get update -y
+          sudo apt-get install -y curl unzip xz-utils zip
       #3. Grabbed from https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz >> on same page as above
       - name: Install Flutter SDK
         run: |
-          curl -o fluter_linux.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && where flutter_linux.tar.xz && tar -xf flutter_linux.tar.xz && echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
+          curl -o fluter_linux.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && tar -xf flutter_linux.tar.xz && echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
       #4. Check Version of Flutter
       - name: Check Flutter Version
         run: flutter --version
