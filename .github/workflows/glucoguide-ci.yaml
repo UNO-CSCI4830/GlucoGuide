@@ -34,10 +34,14 @@ jobs:
           flutter pub get
       #6. Use Flutter to run tests
       - name: Flutter Tests Code
-        run: flutter test
+        run: | 
+          cd glucoguide
+          flutter test
       #7. Use Flutter to Analyze the code
       - name: Flutter Analyze Code
-        run: flutter analyze
+        run: | 
+          cd glucoguide
+          flutter analyze
 
   build_glucoguide:
     name: Build GlucoGudie Application
@@ -65,4 +69,6 @@ jobs:
           flutter pub get
       #6. Build GlucoGuide
       - name: Build GlucoGuide Application
-        run: flutter build apk --release
+        run: |
+          cd glucoguide
+          flutter build apk --release
