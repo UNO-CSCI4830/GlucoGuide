@@ -23,7 +23,7 @@ jobs:
       #3. Grabbed from https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz >> on same page as above
       - name: Install Flutter SDK
         run: |
-          curl -o fluter_linux.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && tar -xf flutter_linux.tar.xz && echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
+          curl -o flutter_linux.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && tar -xf flutter_linux.tar.xz && echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
       #4. Check Version of Flutter
       - name: Check Flutter Version
         run: flutter --version
@@ -52,7 +52,7 @@ jobs:
       #3. Grabbed from https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz >> on same page as above
       - name: Install Flutter SDK
         run: |
-          curl -o fluter_linux.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && tar -xf flutter_linux.tar.xz && echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
+          curl -o flutter_linux.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && tar -xf flutter_linux.tar.xz && echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
       #4. Check Version of Flutter
       - name: Check Flutter Version
         run: flutter --version
