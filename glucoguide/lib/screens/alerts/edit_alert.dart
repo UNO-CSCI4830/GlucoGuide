@@ -2,16 +2,21 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-//page to edit existing alert
 class EditAlert extends StatefulWidget {
   final Map<String, dynamic> alert;
   final Function(Map<String, dynamic>) onDelete;
   final String alertID;
+  final List<Map<String, dynamic>> alertsList; // Pass alertsList here
+  final Function(List<Map<String, dynamic>>)
+      onUpdateAlertsList; // Callback for parent state
+
   const EditAlert({
     Key? key,
     required this.alert,
     required this.onDelete,
     required this.alertID,
+    required this.alertsList,
+    required this.onUpdateAlertsList,
   }) : super(key: key);
 
   @override
@@ -26,45 +31,48 @@ class edit_alert extends State<EditAlert> {
   @override
   void initState() {
     super.initState();
-    assert(widget.alertID != null && widget.alertID.isNotEmpty, "Alert ID is required");
+    assert(widget.alertID != null && widget.alertID.isNotEmpty,
+        "Alert ID is required");
     alert_name.text = widget.alert['title'] ?? '';
     selected_date.text = widget.alert['date'] ?? '';
     selected_time.text = widget.alert['time'] ?? '';
   }
 
   void dispose() {
-   alert_name.dispose();
+    alert_name.dispose();
     selected_date.dispose();
-   selected_time.dispose();
-   super.dispose();
-  } 
+    selected_time.dispose();
+    super.dispose();
+  }
 
   Future<void> _selectDate(BuildContext context) async {
-  final DateTime? picked = await showDatePicker(
-    context: context,
-    initialDate: DateTime.now(),
-    firstDate: DateTime(2000),
-    lastDate: DateTime(2101),
-  );
-  if (picked != null) {
-    selected_date.text = picked.toLocal().toString().split(' ')[0];
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      selected_date.text = picked.toLocal().toString().split(' ')[0];
+    }
   }
-}
 
-Future<void> _selectTime(BuildContext context) async {
-  final TimeOfDay? picked = await showTimePicker(
-    context: context,
-    initialTime: TimeOfDay.now(),
-  );
-  if (picked != null) {
-    selected_time.text = picked.format(context);
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      selected_time.text = picked.format(context);
+    }
   }
-}
- // Function to update the alert in Firebase
+
+  // Function to update the alert in Firebase
   Future<void> _updateAlert() async {
     try {
       // Reference to the alert document in Firestore
-      final alertRef = FirebaseFirestore.instance.collection('alerts').doc(widget.alertID);
+      final alertRef =
+          FirebaseFirestore.instance.collection('alerts').doc(widget.alertID);
 
       // Update the alert in Firestore
       await alertRef.update({
@@ -88,25 +96,33 @@ Future<void> _selectTime(BuildContext context) async {
     }
   }
 
- // Function to delete the alert from Firebase
   Future<void> _deleteAlert() async {
     try {
-      final alertRef = FirebaseFirestore.instance.collection('alerts').doc(widget.alertID);
+      final alertRef =
+          FirebaseFirestore.instance.collection('alerts').doc(widget.alertID);
 
       // Delete the alert from Firestore
       await alertRef.delete();
 
-      // Call the onDelete callback in the parent widget
+      // Remove the alert locally from alertsList
+      final updatedAlertsList =
+          List<Map<String, dynamic>>.from(widget.alertsList)
+            ..removeWhere((alert) => alert['title'] == widget.alertID);
+
+      // Call the parent widget's callback to update alertsList
+      widget.onUpdateAlertsList(updatedAlertsList);
+
+      // Call the onDelete callback (optional)
       widget.onDelete(widget.alert);
 
-      // Navigate back to the AlertsPage after deletion
+      // Navigate back to the AlertsPage
       Navigator.pop(context);
     } catch (e) {
       print('Failed to delete alert: $e');
     }
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

@@ -12,39 +12,52 @@ class AlertsPage extends StatefulWidget {
 }
 
 class _AlertsPageState extends State<AlertsPage> {
-  final List<Map<String, dynamic>> _alerts = []; // List to store alerts
-
-  //Function to delete an alert
-  void _deleteAlert(Map<String, dynamic> alert){
-    setState((){
-      _alerts.remove(alert);
-    });
-  }
-  // Function to add an alert to the list
-  void _addAlert(Map<String, dynamic> alert) {
-    setState(() {
-      _alerts.add(alert);
-    });
-
-    // instantiate user provider
+  // Function to delete an alert
+  void _deleteAlert(Map<String, dynamic> alert) {
+    // Access UserProvider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
+    // Remove the alert from the provider
+    final currentAlerts =
+        List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+    currentAlerts.removeWhere(
+        (a) => a['title'] == alert['title']); // Use title as identifier
+    userProvider.updateUserProfile({'alerts': currentAlerts});
+
+    setState(() {}); // Update the UI
+  }
+
+  // Function to add an alert to the list
+  void _addAlert(Map<String, dynamic> alert) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Add the alert to the provider
     final currentAlerts =
         List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
     currentAlerts.add(alert);
-
-    // update userProfile
     userProvider.updateUserProfile({'alerts': currentAlerts});
+
+    setState(() {}); // Update the UI
   }
 
   // Function to update an alert in the list
-  void _updateAlert(int index, Map<String, dynamic> updatedAlert) {
-    setState(() {
-      _alerts[index] = updatedAlert;
-    });
+  void _updateAlert(Map<String, dynamic> updatedAlert) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Update the alert in the provider
+    final currentAlerts =
+        List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+    final index = currentAlerts.indexWhere(
+        (a) => a['title'] == updatedAlert['title']); // Use title as identifier
+    if (index != -1) {
+      currentAlerts[index] = updatedAlert;
+      userProvider.updateUserProfile({'alerts': currentAlerts});
+    }
+
+    setState(() {}); // Update the UI
   }
 
-    // Function to navigate to EditAlert page
+  // Function to navigate to EditAlert page
   void _editAlert(Map<String, dynamic> alert) {
     Navigator.push(
       context,
@@ -52,7 +65,17 @@ class _AlertsPageState extends State<AlertsPage> {
         builder: (context) => EditAlert(
           alert: alert,
           onDelete: _deleteAlert, // Pass the delete function
-          alertID: alert['id'],
+          alertID: alert['title'], // Use title as identifier
+          alertsList: List<Map<String, dynamic>>.from(
+              Provider.of<UserProvider>(context, listen: false)
+                      .userProfile
+                      ?.alerts ??
+                  []), // Pass the actual alerts list
+          onUpdateAlertsList: (updatedList) {
+            // Update the UserProfile alerts list using the UserProvider
+            Provider.of<UserProvider>(context, listen: false)
+                .updateUserProfile({'alerts': updatedList});
+          },
         ),
       ),
     );
@@ -60,7 +83,8 @@ class _AlertsPageState extends State<AlertsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final userProfile = Provider.of<UserProvider>(context).userProfile;
+    final userProvider = Provider.of<UserProvider>(context);
+    final userProfile = userProvider.userProfile;
     final alertsList = userProfile?.alerts ?? [];
 
     return Scaffold(
@@ -78,7 +102,7 @@ class _AlertsPageState extends State<AlertsPage> {
                 // Navigate to AddAlert page and wait for result
                 final newAlert = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddAlert()),
+                  MaterialPageRoute(builder: (context) => const AddAlert()),
                 );
                 if (newAlert != null) {
                   _addAlert(newAlert); // Add new alert to the list
@@ -90,27 +114,35 @@ class _AlertsPageState extends State<AlertsPage> {
             // Display the alerts
             Expanded(
               child: ListView.builder(
-                itemCount: alertsList?.length,
+                itemCount: alertsList.length,
                 itemBuilder: (context, index) {
-                  final alert = alertsList?[index];
-                  if (alert != null) {
-                    return ListTile(
-                        title: Text(alert['title']),
-                        subtitle: Text(
-                            'Date: ${alert['date']}, Time: ${alert['time']}'),
-                        onTap: () async {
-                          //Navigate to edit_alert page and wait for input
-                          final updated_alert = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditAlert(alert: alert, onDelete: _deleteAlert, alertID: alert['id'],),
-                            ),
-                          );
-                          if (updated_alert != null) {
-                            _updateAlert(index, updated_alert);
-                          }
-                        });
-                  }
+                  final alert = alertsList[index];
+                  return ListTile(
+                    title: Text(alert['title']),
+                    subtitle:
+                        Text('Date: ${alert['date']}, Time: ${alert['time']}'),
+                    onTap: () async {
+                      final updatedAlert = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditAlert(
+                            alert: alert,
+                            onDelete: _deleteAlert, // Handle deletion
+                            alertID: alert['title'], // Use title as identifier
+                            alertsList: alertsList, // Pass alerts list
+                            onUpdateAlertsList: (updatedList) {
+                              // Update alerts list in UserProvider
+                              userProvider
+                                  .updateUserProfile({'alerts': updatedList});
+                            },
+                          ),
+                        ),
+                      );
+                      if (updatedAlert != null) {
+                        _updateAlert(updatedAlert); // Update the alert
+                      }
+                    },
+                  );
                 },
               ),
             ),
