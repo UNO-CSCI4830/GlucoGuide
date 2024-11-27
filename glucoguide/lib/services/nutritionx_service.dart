@@ -1,16 +1,21 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class NutritionixService {
-  final String appId = '<APP_ID>';
-  final String appKey = '<APP_KEY>';
+  final String? appId = dotenv.env['API_ID'];
+  final String? appKey = dotenv.env['API_KEY'];
 
   Future<List<dynamic>> searchFood(String query) async {
+    if (appId == null || appKey == null) {
+      throw Exception('API credentials are missing!');
+    }
+
     final url = Uri.parse(
         'https://trackapi.nutritionix.com/v2/search/instant?query=$query');
     final headers = {
-      'X-APP-ID': appId,
-      'X-APP-KEY': appKey,
+      'X-APP-ID': appId!,
+      'X-APP-KEY': appKey!,
     };
 
     final response = await http.get(url, headers: headers);
@@ -23,13 +28,16 @@ class NutritionixService {
     }
   }
 
-  // Added a search for food item details
   Future<Map<String, dynamic>> getFoodDetails(String itemId) async {
+    if (appId == null || appKey == null) {
+      throw Exception('API credentials are missing!');
+    }
+
     final url = Uri.parse(
         'https://trackapi.nutritionix.com/v2/search/item?nix_item_id=$itemId');
     final headers = {
-      'X-APP-ID': appId,
-      'X-APP-KEY': appKey,
+      'X-APP-ID': appId!,
+      'X-APP-KEY': appKey!,
     };
 
     final response = await http.get(url, headers: headers);
