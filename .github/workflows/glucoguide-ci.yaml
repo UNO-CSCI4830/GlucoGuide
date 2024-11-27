@@ -29,7 +29,9 @@ jobs:
         run: flutter --version
       #5. Install Dep.
       - name: Download All Dependencies 
-        run: flutter pub get
+        run: |
+          cd glucoguide
+          flutter pub get
       #6. Use Flutter to run tests
       - name: Flutter Tests Code
         run: flutter test
@@ -58,7 +60,9 @@ jobs:
         run: flutter --version
       #5. Install Dep.
       - name: Download All Dependencies 
-        run: flutter pub get
+        run: |
+          cd glucoguide
+          flutter pub get
       #6. Build GlucoGuide
       - name: Build GlucoGuide Application
         run: flutter build apk --release
