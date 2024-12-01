@@ -3,6 +3,12 @@ import 'package:glucoguide/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'add_alert.dart';
 import 'edit_alert.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'notification_services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+
 
 class AlertsPage extends StatefulWidget {
   const AlertsPage({super.key});
@@ -12,6 +18,54 @@ class AlertsPage extends StatefulWidget {
 }
 
 class _AlertsPageState extends State<AlertsPage> {
+  @override
+void initState() {
+  super.initState();
+  tz.initializeTimeZones();
+}
+
+
+Future<void> scheduleAlertNotifications(BuildContext context) async {
+  final alerts = await fetchAlerts(context);
+  for (final alert in alerts) {
+    final scheduledTime = DateTime.parse('${alert['date']} ${alert['time']}');
+    if (scheduledTime.isAfter(DateTime.now())) {
+       final tzScheduledTime = tz.TZDateTime.from(scheduledTime, tz.local);
+       tz.setLocalLocation(tz.getLocation('US/Central'));
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        alert['title'], // Unique ID
+        alert['title'], // Notification title
+        alert['title'], // Notification body
+        tzScheduledTime, // Adjust for timezone
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'alert_channel', 'Alerts',
+            channelDescription: 'Notifications for alerts', // Channel description
+            importance: Importance.high, // Adjust notification importance
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true, // Show alert
+            presentBadge: true, // Show badge
+            presentSound: true, // Play sound
+          ),
+        ),
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+    }
+  }
+}
+
+Future<List<Map<String, dynamic>>> fetchAlerts(BuildContext context) async {
+  final userProvider = Provider.of<UserProvider>(context, listen: false); // Replace with dynamic user ID logic
+  final alerts = List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+
+  return alerts;
+}
+
+
   // Function to delete an alert
   void _deleteAlert(Map<String, dynamic> alert) {
     // Access UserProvider
@@ -52,9 +106,8 @@ class _AlertsPageState extends State<AlertsPage> {
     if (index != -1) {
       currentAlerts[index] = updatedAlert;
       userProvider.updateUserProfile({'alerts': currentAlerts});
+      setState(() {}); // Update the UI
     }
-
-    setState(() {}); // Update the UI
   }
 
   // Function to navigate to EditAlert page

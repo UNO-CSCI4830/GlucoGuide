@@ -67,27 +67,36 @@ class edit_alert extends State<EditAlert> {
     }
   }
 
+
   // Function to update the alert in Firebase
   Future<void> _updateAlert() async {
     try {
       // Reference to the alert document in Firestore
-      final alertRef =
-          FirebaseFirestore.instance.collection('alerts').doc(widget.alertID);
+    final alertRef =
+        FirebaseFirestore.instance.collection('alerts').doc(widget.alertID);
 
-      // Update the alert in Firestore
-      await alertRef.update({
-        'title': alert_name.text.isNotEmpty ? alert_name.text : '',
-        'date': selected_date.text.isNotEmpty ? selected_date.text : '',
-        'time': selected_time.text.isNotEmpty ? selected_time.text : '',
-      });
+    // Update alert in Firestore
+    await alertRef.update({
+      'title': alert_name.text.isNotEmpty ? alert_name.text : '',
+      'date': selected_date.text.isNotEmpty ? selected_date.text : '',
+      'time': selected_time.text.isNotEmpty ? selected_time.text : '',
+    });
 
-      // If successful, return the updated alert to the previous page
-      final updatedAlert = {
-        'title': alert_name.text,
-        'date': selected_date.text,
-        'time': selected_time.text,
-        'id': widget.alertID, // Ensure the ID is retained
-      };
+    final updatedAlert = {
+      'title': alert_name.text,
+      'date' : selected_date.text,
+      'time' : selected_time.text,
+      'id' : widget.alertID,
+    };
+
+    // Update the alert locally in alertsList
+    final updatedAlertsList = List<Map<String, dynamic>>.from(widget.alertsList);
+    final index = updatedAlertsList.indexWhere((alert) => alert['title'] == widget.alert['title']);
+    if ( index != -1){
+      updatedAlertsList[index] = updatedAlert;
+    }
+    // Call the parent widget's callback to update alertsList
+    widget.onUpdateAlertsList(updatedAlertsList);
 
       Navigator.pop(context, updatedAlert);
     } catch (e) {

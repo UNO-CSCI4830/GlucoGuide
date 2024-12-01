@@ -6,10 +6,12 @@ import 'package:glucoguide/screens/app_settings/app_settings.dart';
 import 'package:glucoguide/screens/login/login_page.dart';
 import 'package:glucoguide/screens/signup/register__page.dart';
 import 'package:provider/provider.dart';
+import 'package:glucoguide/screens/alerts/notification_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase
+  await initializeNotifications();
 
   runApp(
     MultiProvider(
@@ -20,6 +22,7 @@ void main() async {
     ),
   );
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
