@@ -31,16 +31,19 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
+              key: const Key('emailField'),
               controller: _emailController,
               decoration: const InputDecoration(labelText: 'Email'),
             ),
             TextField(
+              key: const Key('passwordField'),
               controller: _passwordController,
               decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              key: const Key('signInButton'),
               onPressed: _signInUser,
               child: const Text('Sign In'),
             ),

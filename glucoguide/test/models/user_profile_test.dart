@@ -16,6 +16,7 @@ void main() {
         unit: 'Metric',
       );
 
+      print('test');
       expect(user.uid, '12345');
       expect(user.email, 'test@example.com');
       expect(user.name, 'John Doe');
