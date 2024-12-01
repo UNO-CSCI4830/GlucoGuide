@@ -6,7 +6,6 @@ import 'package:glucoguide/providers/user_provider.dart';
 import 'package:glucoguide/screens/login/login_page.dart';
 import 'package:glucoguide/screens/signup/register__page.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../mock_firebase.dart';
 
@@ -14,29 +13,30 @@ void main() {
   setupFirebaseAuthMocks();
 
   setUpAll(() async {
-    // Mock Firebase initialization
+    print("Initializing Firebase...");
     await Firebase.initializeApp();
+    print("Firebase initialized.");
   });
+
   group("Login Page Tests:", () {
     testWidgets("Mocks FirebaseAuth and verifies widgets",
         (WidgetTester tester) async {
-      final FirebaseAuth authService = FirebaseAuth.instance;
-
-      // inject dependencies
+      print("Running widget verification test...");
       await tester.pumpWidget(
         MaterialApp(
           home: LoginPage(),
         ),
       );
 
-      // Assert widgets exist (email and pass fields)
+      print("Asserting email and password fields...");
       expect(find.byKey(const Key('emailField')), findsOneWidget);
       expect(find.byKey(const Key('passwordField')), findsOneWidget);
+      print("Widget verification test passed.");
     });
 
     testWidgets("Navigates to Register Page when button is tapped",
         (WidgetTester tester) async {
-      // Inject dependencies
+      print("Running navigation to Register Page test...");
       await tester.pumpWidget(
         MaterialApp(
           home: LoginPage(),
@@ -46,50 +46,51 @@ void main() {
         ),
       );
 
-      // Tap "Go to Register" button
+      print("Tapping 'Go to Register' button...");
       await tester.tap(find.text('Go to Register'));
       await tester.pumpAndSettle();
 
-      // Verify that RegisterPage is displayed
+      print("Asserting navigation to Register Page...");
       expect(find.byType(RegisterPage), findsOneWidget);
+      print("Navigation test passed.");
     });
 
     testWidgets("Allows text entry in email and password fields",
         (WidgetTester tester) async {
+      print("Running text entry test...");
       await tester.pumpWidget(
         MaterialApp(
           home: const LoginPage(),
         ),
       );
 
-      // Enter text into the email field
+      print("Entering text into email field...");
       await tester.enterText(
           find.byKey(const Key('emailField')), 'test@example.com');
       expect(find.text('test@example.com'), findsOneWidget);
 
-      // Enter text into the password field
+      print("Entering text into password field...");
       await tester.enterText(
           find.byKey(const Key('passwordField')), 'password123');
       expect(find.text('password123'), findsOneWidget);
+      print("Text entry test passed.");
     });
 
     testWidgets("Sign-In button exists and can be tapped",
         (WidgetTester tester) async {
+      print("Running Sign-In button test...");
       await tester.pumpWidget(
         MaterialApp(
           home: const LoginPage(),
         ),
       );
 
-      // Find the Sign-In button
+      print("Finding and tapping Sign-In button...");
       final signInButton = find.text('Sign In');
       expect(signInButton, findsOneWidget);
-
-      // Tap the button
       await tester.tap(signInButton);
-      await tester.pump(); // Process the tap
-
-      // Since this test doesn't check backend, it only ensures the button works
+      await tester.pump();
+      print("Sign-In button test passed.");
     });
   });
 }
