@@ -7,8 +7,7 @@ class EditAlert extends StatefulWidget {
   final Function(Map<String, dynamic>) onDelete;
   final String alertID;
   final List<Map<String, dynamic>> alertsList; // Pass alertsList here
-  final Function(List<Map<String, dynamic>>)
-      onUpdateAlertsList; // Callback for parent state
+  final Function(List<Map<String, dynamic>>) onUpdateAlertsList; // Callback for parent state
 
   const EditAlert({
     Key? key,

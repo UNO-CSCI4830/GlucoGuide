@@ -3,73 +3,92 @@ import 'package:glucoguide/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'add_alert.dart';
 import 'edit_alert.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'notification_services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
+import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+
 
 
 class AlertsPage extends StatefulWidget {
   const AlertsPage({super.key});
 
+
   @override
   State<AlertsPage> createState() => _AlertsPageState();
 }
+
 
 class _AlertsPageState extends State<AlertsPage> {
   @override
 void initState() {
   super.initState();
-  tz.initializeTimeZones();
+  initializeFCM();
 }
 
 
-Future<void> scheduleAlertNotifications(BuildContext context) async {
-  final alerts = await fetchAlerts(context);
-  for (final alert in alerts) {
-    final scheduledTime = DateTime.parse('${alert['date']} ${alert['time']}');
-    if (scheduledTime.isAfter(DateTime.now())) {
-       final tzScheduledTime = tz.TZDateTime.from(scheduledTime, tz.local);
-       tz.setLocalLocation(tz.getLocation('US/Central'));
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-        alert['title'], // Unique ID
-        alert['title'], // Notification title
-        alert['title'], // Notification body
-        tzScheduledTime, // Adjust for timezone
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            'alert_channel', 'Alerts',
-            channelDescription: 'Notifications for alerts', // Channel description
-            importance: Importance.high, // Adjust notification importance
-            priority: Priority.high,
-          ),
-          iOS: DarwinNotificationDetails(
-            presentAlert: true, // Show alert
-            presentBadge: true, // Show badge
-            presentSound: true, // Play sound
-          ),
-        ),
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
+Future<void> initializeFCM() async{
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  //Request notification permissions
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message){
+    if(message.data.containsKey('alerts')){
+      final newAlerts = List<Map<String, dynamic>>.from(
+        jsonDecode(message.data['alerts']),
       );
+
+
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.updateUserProfile({'alerts': newAlerts});
+
+
+      setState(() {});
     }
+  });
+
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+}
+
+
+static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) async {
+    print('Handling a background message: ${message.messageId}');
   }
-}
 
-Future<List<Map<String, dynamic>>> fetchAlerts(BuildContext context) async {
-  final userProvider = Provider.of<UserProvider>(context, listen: false); // Replace with dynamic user ID logic
-  final alerts = List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
 
-  return alerts;
-}
+// Fetch alerts from UserProvider
+  Future<List<Map<String, dynamic>>> fetchAlerts(BuildContext context) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    return List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+  }
+
+
+  // Function to add an alert to the list
+  void _addAlert(Map<String, dynamic> alert) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+
+    // Add the alert to the provider
+    final currentAlerts =
+        List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+    currentAlerts.add(alert);
+    userProvider.updateUserProfile({'alerts': currentAlerts});
+
+
+    setState(() {}); // Update the UI
+  }
 
 
   // Function to delete an alert
   void _deleteAlert(Map<String, dynamic> alert) {
     // Access UserProvider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+
 
     // Remove the alert from the provider
     final currentAlerts =
@@ -78,25 +97,15 @@ Future<List<Map<String, dynamic>>> fetchAlerts(BuildContext context) async {
         (a) => a['title'] == alert['title']); // Use title as identifier
     userProvider.updateUserProfile({'alerts': currentAlerts});
 
-    setState(() {}); // Update the UI
-  }
-
-  // Function to add an alert to the list
-  void _addAlert(Map<String, dynamic> alert) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    // Add the alert to the provider
-    final currentAlerts =
-        List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
-    currentAlerts.add(alert);
-    userProvider.updateUserProfile({'alerts': currentAlerts});
 
     setState(() {}); // Update the UI
   }
+
 
   // Function to update an alert in the list
   void _updateAlert(Map<String, dynamic> updatedAlert) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+
 
     // Update the alert in the provider
     final currentAlerts =
@@ -110,35 +119,13 @@ Future<List<Map<String, dynamic>>> fetchAlerts(BuildContext context) async {
     }
   }
 
-  // Function to navigate to EditAlert page
-  void _editAlert(Map<String, dynamic> alert) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditAlert(
-          alert: alert,
-          onDelete: _deleteAlert, // Pass the delete function
-          alertID: alert['title'], // Use title as identifier
-          alertsList: List<Map<String, dynamic>>.from(
-              Provider.of<UserProvider>(context, listen: false)
-                      .userProfile
-                      ?.alerts ??
-                  []), // Pass the actual alerts list
-          onUpdateAlertsList: (updatedList) {
-            // Update the UserProfile alerts list using the UserProvider
-            Provider.of<UserProvider>(context, listen: false)
-                .updateUserProfile({'alerts': updatedList});
-          },
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final userProfile = userProvider.userProfile;
     final alertsList = userProfile?.alerts ?? [];
+
 
     return Scaffold(
       appBar: AppBar(
@@ -183,17 +170,17 @@ Future<List<Map<String, dynamic>>> fetchAlerts(BuildContext context) async {
                             onDelete: _deleteAlert, // Handle deletion
                             alertID: alert['title'], // Use title as identifier
                             alertsList: alertsList, // Pass alerts list
-                            onUpdateAlertsList: (updatedList) {
-                              // Update alerts list in UserProvider
-                              userProvider
-                                  .updateUserProfile({'alerts': updatedList});
+                            onUpdateAlertsList: (updatedAlertsList) {
+                            // Find the alert to update and call _updateAlert for it
+                            final updatedAlert = updatedAlertsList.firstWhere((alert) => alert['title'] == alert['title']);
+                            _updateAlert(updatedAlert);
                             },
                           ),
                         ),
                       );
                       if (updatedAlert != null) {
-                        _updateAlert(updatedAlert); // Update the alert
-                      }
+                        _updateAlert(updatedAlert);
+                                  }
                     },
                   );
                 },
@@ -205,3 +192,4 @@ Future<List<Map<String, dynamic>>> fetchAlerts(BuildContext context) async {
     );
   }
 }
+
