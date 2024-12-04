@@ -19,56 +19,6 @@ class _EditProfilePage extends State<EditProfilePage> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   String inputValue = '';
 
-  String popUpBox(String title, String text, String uid) {
-    final User? user = _auth.currentUser;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Enter Change'),
-          content: TextField(
-            onChanged: (value) {
-              inputValue = value;
-            },
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                text = inputValue;
-                setState(() {});
-                if (title == 'User Name') {
-                  updateUserName(user, inputValue);
-                  Navigator.of(context).pop();
-                }
-                if (title == 'Height') {
-                  updateHeight(user, inputValue);
-                  Navigator.of(context).pop();
-                }
-
-                if (title == 'Country') {
-                  updateCountry(user, inputValue);
-                  Navigator.of(context).pop();
-                }
-                if (title == 'Weight') {
-                  updateWeight(user, inputValue);
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-    return inputValue;
-  }
-
   @override
   Widget build(BuildContext context) {
     final userProfile = Provider.of<UserProvider>(context).userProfile;
@@ -77,17 +27,12 @@ class _EditProfilePage extends State<EditProfilePage> {
     final List<EditProfileItems> settings = [
       EditProfileItems(
           title: 'User Name', fieldName: 'name', text: userProfile!.name),
-      EditProfileItems(title: 'Profile Photo', text: '', icon: Icons.person),
       EditProfileItems(
           title: 'Height',
           fieldName: 'height',
           text: (userProfile.height).toString() + ' cm'),
       EditProfileItems(
           title: 'Sex', fieldName: 'gender', text: userProfile.gender),
-      EditProfileItems(
-          title: 'Date of Birth',
-          fieldName: 'dateOfBirth',
-          text: userProfile.dateOfBirth),
       EditProfileItems(
           title: 'Country', fieldName: 'country', text: userProfile.country),
       EditProfileItems(
@@ -96,6 +41,8 @@ class _EditProfilePage extends State<EditProfilePage> {
           title: 'Weight',
           fieldName: 'weight',
           text: (userProfile.weight).toString()),
+      EditProfileItems(
+          title: 'Date of Birth', fieldName: 'dateOfBirth', text: ''),
     ];
     return Card(
         child: StreamBuilder<DocumentSnapshot>(
@@ -195,13 +142,163 @@ class _EditProfilePage extends State<EditProfilePage> {
                               );
                             },
                           );
+                        } else if (setting.fieldName == 'unit') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Select Units'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      title: Text('lbs'),
+                                      onTap: () {
+                                        updateUserUnits(user, 'lbs');
+                                        setting.text = 'lbs';
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        } else if (setting.fieldName == 'name') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Enter Change'),
+                                content: TextField(
+                                  onChanged: (value) {
+                                    inputValue = value;
+                                  },
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text('OK'),
+                                    onPressed: () {
+                                      updateUserName(user, inputValue);
+                                      setting.text = inputValue;
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else if (setting.fieldName == 'height') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Enter Change'),
+                                content: TextField(
+                                  onChanged: (value) {
+                                    inputValue = value;
+                                  },
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text('OK'),
+                                    onPressed: () {
+                                      updateHeight(user, inputValue);
+                                      setting.text = inputValue;
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else if (setting.fieldName == 'country') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Enter Change'),
+                                content: TextField(
+                                  onChanged: (value) {
+                                    inputValue = value;
+                                  },
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text('OK'),
+                                    onPressed: () {
+                                      updateCountry(user, inputValue);
+                                      setting.text = inputValue;
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else if (setting.fieldName == 'weight') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Enter Change'),
+                                content: TextField(
+                                  onChanged: (value) {
+                                    inputValue = value;
+                                  },
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text('OK'),
+                                    onPressed: () {
+                                      updateWeight(user, inputValue);
+                                      setting.text = inputValue;
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         } else if (setting.fieldName == 'dateOfBirth') {
-                        } else {
-                          popUpBox(
-                              setting.title, setting.text, userProfile.uid);
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime(2000),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                          );
+                          if (pickedDate != null) {
+                            setState(() {
+                              inputValue =
+                                  "${pickedDate.toLocal()}".split(' ')[0];
+                            });
+                          }
+                          updateDateOfBirth(user, inputValue);
                         }
-                        setting.text =
-                            inputValue; // Change to update setting.text in real time
                       });
                 }));
       },
@@ -241,6 +338,12 @@ class _EditProfilePage extends State<EditProfilePage> {
   Future updateUserUnits(User? user, String newUnit) async {
     await _firestore.collection('users').doc(user?.uid).update({
       'unit': newUnit,
+    });
+  }
+
+  Future updateDateOfBirth(User? user, String newDate) async {
+    await _firestore.collection('users').doc(user?.uid).update({
+      'dateOfBirth': newDate,
     });
   }
 }
