@@ -9,9 +9,7 @@ class ChangePasswordPage extends StatefulWidget {
 }
 
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
-  final _passwordController = TextEditingController();
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _emailController = TextEditingController();
 
   String _status = ''; // Status message to display registration result
 
@@ -19,7 +17,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Center(child: const Text('Changing Password')),
+          title: Center(child: const Text('Password Change')),
           backgroundColor: Colors.white,
         ),
         body: Padding(
@@ -28,8 +26,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: "Change Password"),
+                controller: _emailController,
+                decoration:
+                    const InputDecoration(labelText: "Enter your email"),
                 obscureText: true,
               ),
               const SizedBox(height: 20),
@@ -60,10 +59,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             ),
             TextButton(
               onPressed: () {
-                _changePassword;
-                // child:
+                _changePassword(_emailController.text.trim());
                 const Text('Button yes');
                 Navigator.of(context).pop();
+                _emailController.clear();
               },
               child: Text('Yes'),
             ),
@@ -73,7 +72,45 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Future<void> _changePassword(String code, String newPassword) async {
-    // This will change the password through an email to the users account
+  Future<void> _changePassword(String email) async {
+    print('test');
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      print('sent password reset email');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Password Reset send to email'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      print('Error sending email');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error sending reset email'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
