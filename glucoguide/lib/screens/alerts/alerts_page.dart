@@ -5,28 +5,44 @@ import 'add_alert.dart';
 import 'edit_alert.dart';
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
-
-
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class AlertsPage extends StatefulWidget {
   const AlertsPage({super.key});
-
 
   @override
   State<AlertsPage> createState() => _AlertsPageState();
 }
 
-
 class _AlertsPageState extends State<AlertsPage> {
-  @override
-void initState() {
-  super.initState();
-  initializeFCM();
-}
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
+  @override void initState(){
+    super.initState();
+    initializeNotifications();
+    initializeFCM();
+  }
 
-Future<void> initializeFCM() async{
+    // Initialize Local Notifications
+  void initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher'); // Your app icon
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+      // Handle notification tapped logic here
+      if (response.payload != null) {
+        print('Notification payload: ${response.payload}');
+      }
+      },
+    );
+  }
+
+  Future<void> initializeFCM() async{
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   //Request notification permissions
   NotificationSettings settings = await messaging.requestPermission(
@@ -34,9 +50,7 @@ Future<void> initializeFCM() async{
     badge: true,
     sound: true,
   );
-
-
-  FirebaseMessaging.onMessage.listen((RemoteMessage message){
+ FirebaseMessaging.onMessage.listen((RemoteMessage message){
     if(message.data.containsKey('alerts')){
       final newAlerts = List<Map<String, dynamic>>.from(
         jsonDecode(message.data['alerts']),
@@ -45,12 +59,12 @@ Future<void> initializeFCM() async{
 
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.updateUserProfile({'alerts': newAlerts});
-
-
       setState(() {});
+
+
+      _showNotification(message);
     }
   });
-
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 }
@@ -59,7 +73,29 @@ Future<void> initializeFCM() async{
 static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) async {
     print('Handling a background message: ${message.messageId}');
   }
+// Function to display the notification
+  Future<void> _showNotification(RemoteMessage message) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'alerts_channel', // Channel ID
+      'Alerts Notifications', // Channel Name
+      channelDescription: 'Channel for alert notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
 
+
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID (you can use any unique ID)
+      message.notification?.title ?? 'Alert', // Notification title
+      message.notification?.body ?? 'You have a new alert', // Notification body
+      platformChannelSpecifics,
+      payload: message.data['alerts'], // Optional: payload can contain additional data
+    );
+  }
 
 // Fetch alerts from UserProvider
   Future<List<Map<String, dynamic>>> fetchAlerts(BuildContext context) async {
@@ -68,27 +104,10 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
   }
 
 
-  // Function to add an alert to the list
-  void _addAlert(Map<String, dynamic> alert) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-
-    // Add the alert to the provider
-    final currentAlerts =
-        List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
-    currentAlerts.add(alert);
-    userProvider.updateUserProfile({'alerts': currentAlerts});
-
-
-    setState(() {}); // Update the UI
-  }
-
-
   // Function to delete an alert
   void _deleteAlert(Map<String, dynamic> alert) {
     // Access UserProvider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-
 
     // Remove the alert from the provider
     final currentAlerts =
@@ -97,15 +116,25 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
         (a) => a['title'] == alert['title']); // Use title as identifier
     userProvider.updateUserProfile({'alerts': currentAlerts});
 
+    setState(() {}); // Update the UI
+  }
+
+  // Function to add an alert to the list
+  void _addAlert(Map<String, dynamic> alert) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Add the alert to the provider
+    final currentAlerts =
+        List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+    currentAlerts.add(alert);
+    userProvider.updateUserProfile({'alerts': currentAlerts});
 
     setState(() {}); // Update the UI
   }
 
-
   // Function to update an alert in the list
   void _updateAlert(Map<String, dynamic> updatedAlert) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-
 
     // Update the alert in the provider
     final currentAlerts =
@@ -115,17 +144,40 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
     if (index != -1) {
       currentAlerts[index] = updatedAlert;
       userProvider.updateUserProfile({'alerts': currentAlerts});
-      setState(() {}); // Update the UI
     }
+
+    setState(() {}); // Update the UI
   }
 
+  // Function to navigate to EditAlert page
+  void _editAlert(Map<String, dynamic> alert) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditAlert(
+          alert: alert,
+          onDelete: _deleteAlert, // Pass the delete function
+          alertID: alert['title'], // Use title as identifier
+          alertsList: List<Map<String, dynamic>>.from(
+              Provider.of<UserProvider>(context, listen: false)
+                      .userProfile
+                      ?.alerts ??
+                  []), // Pass the actual alerts list
+          onUpdateAlertsList: (updatedList) {
+            // Update the UserProfile alerts list using the UserProvider
+            Provider.of<UserProvider>(context, listen: false)
+                .updateUserProfile({'alerts': updatedList});
+          },
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final userProfile = userProvider.userProfile;
     final alertsList = userProfile?.alerts ?? [];
-
 
     return Scaffold(
       appBar: AppBar(
@@ -170,17 +222,17 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
                             onDelete: _deleteAlert, // Handle deletion
                             alertID: alert['title'], // Use title as identifier
                             alertsList: alertsList, // Pass alerts list
-                            onUpdateAlertsList: (updatedAlertsList) {
-                            // Find the alert to update and call _updateAlert for it
-                            final updatedAlert = updatedAlertsList.firstWhere((alert) => alert['title'] == alert['title']);
-                            _updateAlert(updatedAlert);
+                            onUpdateAlertsList: (updatedList) {
+                              // Update alerts list in UserProvider
+                              userProvider
+                                  .updateUserProfile({'alerts': updatedList});
                             },
                           ),
                         ),
                       );
                       if (updatedAlert != null) {
-                        _updateAlert(updatedAlert);
-                                  }
+                        _updateAlert(updatedAlert); // Update the alert
+                      }
                     },
                   );
                 },
@@ -192,4 +244,3 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
     );
   }
 }
-

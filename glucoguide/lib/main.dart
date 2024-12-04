@@ -7,6 +7,7 @@ import 'package:glucoguide/screens/login/login_page.dart';
 import 'package:glucoguide/screens/signup/register__page.dart';
 import 'package:provider/provider.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase

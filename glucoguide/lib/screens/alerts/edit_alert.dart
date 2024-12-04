@@ -106,20 +106,6 @@ class edit_alert extends State<EditAlert> {
 
   Future<void> _deleteAlert() async {
     try {
-      final alertRef =
-          FirebaseFirestore.instance.collection('alerts').doc(widget.alertID);
-
-      // Delete the alert from Firestore
-      await alertRef.delete();
-
-      // Remove the alert locally from alertsList
-      final updatedAlertsList =
-          List<Map<String, dynamic>>.from(widget.alertsList)
-            ..removeWhere((alert) => alert['title'] == widget.alertID);
-
-      // Call the parent widget's callback to update alertsList
-      widget.onUpdateAlertsList(updatedAlertsList);
-
       // Call the onDelete callback (optional)
       widget.onDelete(widget.alert);
 
