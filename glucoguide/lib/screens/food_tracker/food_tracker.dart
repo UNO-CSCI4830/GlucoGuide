@@ -26,7 +26,7 @@ class _FoodTrackerPageState extends State<FoodTrackerPage> {
             children: const [
               InsulinDoseCalculator(),
               SizedBox(height: 20),
-              FoodSearch(),
+              FoodSearchWidget(),
             ],
           ),
         ),
