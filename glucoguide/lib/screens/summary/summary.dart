@@ -1,8 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_charts/flutter_charts.dart';
 
-class SummaryPage extends StatelessWidget {
+class SummaryPage extends StatefulWidget {
   const SummaryPage({Key? key}) : super(key: key);
+
+  @override
+  _SummaryPageState createState() => _SummaryPageState();
+}
+
+class _SummaryPageState extends State<SummaryPage> {
+  double _a1cGoal = 6.5; 
+
+  void _updateA1CGoal() async {
+  
+    double? newGoal = await showDialog<double>(
+      context: context,
+      builder: (BuildContext context) {
+        final TextEditingController _controller = TextEditingController();
+        return AlertDialog(
+          title: const Text('Set New A1C Goal'),
+          content: TextField(
+            controller: _controller,
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(
+              hintText: 'Enter new A1C goal',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, double.tryParse(_controller.text));
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (newGoal != null) {
+      setState(() {
+        _a1cGoal = newGoal;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +55,26 @@ class SummaryPage extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: <Widget>[
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  'A1C Goal: $_a1cGoal%',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: _updateA1CGoal,
+                  child: const Text('Set New Goal'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20), 
             Expanded(
-              child: chartToRun(), // Shows the chart
+              child: chartToRun(), 
             ),
           ],
         ),
@@ -24,34 +83,31 @@ class SummaryPage extends StatelessWidget {
   }
 
   Widget chartToRun() {
-    // Shows Options
+
     var chartOptions = ChartOptions();
 
-    // Shows Data
+    
     var chartData = ChartData(
       dataRows: [
-        [10.0, 20.0, 30.0, 40.0, 50.0], // Data for line 1
-        [15.0, 25.0, 35.0, 45.0, 55.0], // Data for line 2
+        [10.0, 20.0, 30.0, 40.0, 50.0], 
+        [15.0, 25.0, 35.0, 45.0, 55.0], 
       ],
-      xUserLabels: ["Jan", "Feb", "Mar", "Apr", "May"], // X-axis
-      dataRowsLegends: ["Line 1", "Line 2"], // Legends for the lines
-      chartOptions: chartOptions, // Chart configuration options
+      xUserLabels: ["Jan", "Feb", "Mar", "Apr", "May"], 
+      dataRowsLegends: ["Line 1", "Line 2"], 
+      chartOptions: chartOptions, 
     );
 
-    // Create the LineChartTopContainer
     var lineChartContainer = LineChartTopContainer(
       chartData: chartData,
     );
 
-    // Create the LineChartPainter
     var lineChartPainter = LineChartPainter(
       lineChartContainer: lineChartContainer,
     );
 
-    // Return the LineChart widget
     return LineChart(
       painter: lineChartPainter,
-      size: const Size(400, 300), // Size of chart
+      size: const Size(400, 300), 
     );
   }
 }
