@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../summary/summary.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -51,15 +52,15 @@ class HomePage extends StatelessWidget {
               style: const TextStyle(fontSize: 24),
             ),
             const SizedBox(height: 20),
-            // ElevatedButton(
-            //   onPressed: () {
-            //     Navigator.push(
-            //       context
-            //       // MaterialPageRoute(builder: (context) => const SummaryPage()),
-            //     // );
-            //   },
-            //   child: const Text('Go to Summary'),
-            // ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SummaryPage()),
+                );
+              },
+              child: const Text('Go to Summary'),
+            ),
           ],
         ),
       ),
