@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:glucoguide/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class AlertsPage extends StatefulWidget {
   const AlertsPage({super.key});
@@ -15,6 +17,16 @@ class _AlertsPageState extends State<AlertsPage> {
     setState(() {
       _alerts.add(alert);
     });
+
+    // instantiate user provider
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    final currentAlerts =
+        List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+    currentAlerts.add(alert);
+
+    // update userProfile
+    userProvider.updateUserProfile({'alerts': currentAlerts});
   }
 
   // Function to update an alert in the list
@@ -26,6 +38,9 @@ class _AlertsPageState extends State<AlertsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProfile = Provider.of<UserProvider>(context).userProfile;
+    final alertsList = userProfile?.alerts;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
@@ -53,25 +68,27 @@ class _AlertsPageState extends State<AlertsPage> {
             // Display the alerts
             Expanded(
               child: ListView.builder(
-                itemCount: _alerts.length,
+                itemCount: alertsList?.length,
                 itemBuilder: (context, index) {
-                  final alert = _alerts[index];
-                  return ListTile(
-                      title: Text(alert['title']),
-                      subtitle: Text(
-                          'Date: ${alert['date']}, Time: ${alert['time']}'),
-                      onTap: () async {
-                        //Navigate to edit_alert page and wait for input
-                        final updated_alert = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditAlert(alert: alert),
-                          ),
-                        );
-                        if (updated_alert != null) {
-                          _updateAlert(index, updated_alert);
-                        }
-                      });
+                  final alert = alertsList?[index];
+                  if (alert != null) {
+                    return ListTile(
+                        title: Text(alert['title']),
+                        subtitle: Text(
+                            'Date: ${alert['date']}, Time: ${alert['time']}'),
+                        onTap: () async {
+                          //Navigate to edit_alert page and wait for input
+                          final updated_alert = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditAlert(alert: alert),
+                            ),
+                          );
+                          if (updated_alert != null) {
+                            _updateAlert(index, updated_alert);
+                          }
+                        });
+                  }
                 },
               ),
             ),
