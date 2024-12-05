@@ -19,12 +19,12 @@ class _AlertsPageState extends State<AlertsPage> {
 
   @override void initState(){
     super.initState();
-    initializeNotifications();
-    initializeFCM();
+    //initializeNotifications();
+    //initializeFCM();
   }
 
     // Initialize Local Notifications
-  void initializeNotifications() async {
+  /*void initializeNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher'); // Your app icon
 
@@ -37,6 +37,10 @@ class _AlertsPageState extends State<AlertsPage> {
       // Handle notification tapped logic here
       if (response.payload != null) {
         print('Notification payload: ${response.payload}');
+        final alerts = jsonDecode(response.payload!);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.updateUserProfile({'alerts': alerts});
+        setState(() {});
       }
       },
     );
@@ -60,10 +64,10 @@ class _AlertsPageState extends State<AlertsPage> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.updateUserProfile({'alerts': newAlerts});
       setState(() {});
-
+    }
 
       _showNotification(message);
-    }
+  
   });
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -73,6 +77,7 @@ class _AlertsPageState extends State<AlertsPage> {
 static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) async {
     print('Handling a background message: ${message.messageId}');
   }
+
 // Function to display the notification
   Future<void> _showNotification(RemoteMessage message) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
@@ -102,7 +107,7 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     return List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
   }
-
+*/
 
   // Function to delete an alert
   void _deleteAlert(Map<String, dynamic> alert) {
