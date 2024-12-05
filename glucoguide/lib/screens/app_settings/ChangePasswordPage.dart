@@ -73,15 +73,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Future<void> _changePassword(String email) async {
-    print('test');
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      print('sent password reset email');
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Password Reset send to email'),
+            title: Text('Password Reset send to email.'),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
