@@ -139,4 +139,30 @@ void main() {
     // Check if error message appears
     expect(find.text('Please enter a valid glucose value.'), findsOneWidget);
   });
+
+  testWidgets('testing error message for zero or negative sensitivity factor',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(testWidgetSetup());
+
+    final glucoseField =
+        find.widgetWithText(TextField, 'Blood Glucose (mg/dL)');
+    final carbsField = find.widgetWithText(TextField, 'Carbs (g)');
+    final sensitivityFactorField =
+        find.widgetWithText(TextField, 'Sensitivity Factor');
+    final calculateButton =
+        find.widgetWithText(ElevatedButton, 'Calculate Dose');
+
+    // "entering" 0 for sensitivity factor
+    await tester.enterText(sensitivityFactorField, '0');
+    await tester.enterText(glucoseField, '100');
+    await tester.enterText(carbsField, '100');
+    await tester.pump();
+
+    await tester.tap(calculateButton);
+    await tester.pump();
+
+    // Check if error message appears
+    expect(find.text('Sensitivity factor must be greater than 0.'),
+        findsOneWidget);
+  });
 }
