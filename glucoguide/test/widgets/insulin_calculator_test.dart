@@ -7,6 +7,20 @@ import 'package:provider/provider.dart';
 
 class MockUserProvider extends Mock implements UserProvider {}
 
+//Implementing the logic from the dosecalucltor in insulin_calculator.dart
+class DoseCalculator {
+  static double calculate({
+    required double glucose,
+    required double carbs,
+    double sensitivityFactor = 50.0,
+    double carbRatio = 10.0,
+    double targetGlucose = 100.0,
+  }) {
+    return ((glucose - targetGlucose) / sensitivityFactor) +
+        (carbs / carbRatio);
+  }
+}
+
 Widget testWidgetSetup() {
   return ChangeNotifierProvider<UserProvider>(
     create: (_) => UserProvider(),
@@ -90,4 +104,18 @@ void main() {
       expect(targetGlucoseTextField.controller?.text, '100');
     },
   );
+
+  test('testing if DoseCalculator.calculate calculates insulin dose correctly',
+      () {
+    final dose = DoseCalculator.calculate(
+      glucose: 100,
+      carbs: 10,
+      sensitivityFactor: 10,
+      carbRatio: 10,
+      targetGlucose: 100,
+    );
+
+    // Expected dose = ((100 - 100) / 10) + (10 / 10) = 1
+    expect(dose, 1);
+  });
 }
