@@ -64,4 +64,30 @@ void main() {
     expect(tester.widget<TextField>(glucoseField).controller?.text, '100');
     expect(tester.widget<TextField>(carbsField).controller?.text, '100');
   });
+
+  testWidgets(
+    'test that default values are set in the TextFields',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(testWidgetSetup());
+
+      // finding the TextFields
+      final sensitivityFactorField =
+          find.widgetWithText(TextField, 'Sensitivity Factor');
+      final carbRatioField = find.widgetWithText(TextField, 'Carb Ratio');
+      final targetGlucoseField =
+          find.widgetWithText(TextField, 'Target Glucose (mg/dL)');
+
+      // grabbing the TextField widgets to access their corresponding controllers
+      final sensitivityFactorTextField =
+          tester.widget<TextField>(sensitivityFactorField);
+      final carbRatioTextField = tester.widget<TextField>(carbRatioField);
+      final targetGlucoseTextField =
+          tester.widget<TextField>(targetGlucoseField);
+
+      // checking if the default values are correctly set in the controllers
+      expect(sensitivityFactorTextField.controller?.text, '50');
+      expect(carbRatioTextField.controller?.text, '10');
+      expect(targetGlucoseTextField.controller?.text, '100');
+    },
+  );
 }
