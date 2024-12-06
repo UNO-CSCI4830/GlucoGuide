@@ -6,10 +6,10 @@ class InsulinDoseCalculator extends StatefulWidget {
   const InsulinDoseCalculator({super.key});
 
   @override
-  State<InsulinDoseCalculator> createState() => _InsulinDoseCalculatorState();
+  State<InsulinDoseCalculator> createState() => InsulinDoseCalculatorState();
 }
 
-class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
+class InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
   final TextEditingController glucoseController = TextEditingController();
   final TextEditingController carbsController = TextEditingController();
   final TextEditingController sensitivityFactorController =

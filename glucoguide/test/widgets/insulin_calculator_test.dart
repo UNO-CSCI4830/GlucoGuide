@@ -41,4 +41,22 @@ void main() {
     await tester.pump();
     expect(tester.widget<ElevatedButton>(calculateButton).onPressed, isNotNull);
   });
+
+  testWidgets(
+      'testing if entering values in TextFields updates TextEditingControllers',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(testWidgetSetup());
+
+    final glucoseField =
+        find.widgetWithText(TextField, 'Blood Glucose (mg/dL)');
+    await tester.enterText(glucoseField, '100');
+    await tester.pump();
+
+    final carbsField = find.widgetWithText(TextField, 'Carbs (g)');
+    await tester.enterText(carbsField, '100');
+    await tester.pump();
+
+    expect(tester.widget<TextField>(glucoseField).controller?.text, '100');
+    expect(tester.widget<TextField>(carbsField).controller?.text, '100');
+  });
 }
