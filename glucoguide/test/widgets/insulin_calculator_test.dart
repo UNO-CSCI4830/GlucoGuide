@@ -1,0 +1,44 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+import 'package:glucoguide/providers/user_provider.dart';
+import 'package:glucoguide/widgets/insulin_calculator.dart';
+import 'package:provider/provider.dart';
+
+class MockUserProvider extends Mock implements UserProvider {}
+
+Widget testWidgetSetup() {
+  return ChangeNotifierProvider<UserProvider>(
+    create: (_) => UserProvider(),
+    child: MaterialApp(
+      home: Scaffold(
+        body: InsulinDoseCalculator(),
+      ),
+    ),
+  );
+}
+
+void main() {
+  testWidgets('testing if update button enables', (WidgetTester tester) async {
+    await tester.pumpWidget(testWidgetSetup());
+
+    final glucoseField =
+        find.widgetWithText(TextField, 'Blood Glucose (mg/dL)');
+    final carbsField = find.widgetWithText(TextField, 'Carbs (g)');
+    final calculateButton =
+        find.widgetWithText(ElevatedButton, 'Calculate Dose');
+
+    // Button is initally disabled
+    expect(tester.widget<ElevatedButton>(calculateButton).onPressed, isNull);
+
+    // Enter a glucose value
+    await tester.enterText(glucoseField, '100');
+    await tester.pump();
+    expect(tester.widget<ElevatedButton>(calculateButton).onPressed, isNull);
+
+    // Entering a carb value
+    await tester.enterText(carbsField, '100');
+    await tester.pump();
+    expect(tester.widget<ElevatedButton>(calculateButton).onPressed, isNotNull);
+  });
+}
