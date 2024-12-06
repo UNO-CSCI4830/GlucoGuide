@@ -10,8 +10,10 @@ class ChangePasswordPage extends StatefulWidget {
 
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _emailController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   String _status = ''; // Status message to display registration result
+  String emailValue = '';
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +28,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
-                controller: _emailController,
-                decoration:
-                    const InputDecoration(labelText: "Enter your email"),
-                obscureText: true,
-              ),
+                  controller: _emailController,
+                  decoration:
+                      const InputDecoration(labelText: "Enter your email"),
+                  obscureText: true,
+                  onChanged: (value) {
+                    emailValue = value;
+                  }),
               const SizedBox(height: 20),
               ElevatedButton(
-                  onPressed: () => _confirmPasswordChange(context),
+                  onPressed: () => _testEmail(context, emailValue),
                   child: const Text('Change Password')),
               const SizedBox(height: 20),
               Text(_status),
@@ -42,7 +46,49 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         ));
   }
 
-  void _confirmPasswordChange(BuildContext context) {
+  void _testEmail(BuildContext context, String userEntry) {
+    final User? user = _auth.currentUser;
+    final String? trueEmail = user?.email;
+    if (userEntry == trueEmail) {
+      _confirmPasswordChange(context, userEntry);
+    } else if (userEntry == '') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Please enter your email.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('That is not your email. Please try again.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _confirmPasswordChange(BuildContext context, String userEntry) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -59,7 +105,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             ),
             TextButton(
               onPressed: () {
-                _changePassword(_emailController.text.trim());
+                _changePassword(userEntry);
                 const Text('Button yes');
                 Navigator.of(context).pop();
                 _emailController.clear();
@@ -79,7 +125,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Password Reset send to email.'),
+            title: Text('Password reset send to email.'),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
