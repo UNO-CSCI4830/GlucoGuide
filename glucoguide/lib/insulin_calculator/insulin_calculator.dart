@@ -22,9 +22,6 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
   double insulinDose = 0.0;
   bool canCalculateDose = false;
 
-  //Added log input list for display
-  List<Map<String, dynamic>> doseLogs = [];
-
   void updateButtonState() {
     setState(() {
       canCalculateDose =
@@ -54,11 +51,6 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
       'bloodGlucLevel': glucose,
       'note': 'test dose'
     };
-
-    //Adding dosage into the log list
-    setState(() {
-      doseLogs.add(insulinDoseLog);
-    });
 
     // update user profile via user provider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -109,19 +101,6 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
         ),
         if (insulinDose > 0)
           Text('Dose: ${insulinDose.toStringAsFixed(2)} units'),
-        //Displaying the insulin dose logs
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: doseLogs.length,
-          itemBuilder: (context, index) {
-            final log = doseLogs[index];
-            return ListTile(
-              title: Text('Dose: ${log['dosage']} units'),
-              subtitle: Text(
-                  'Time: ${log['time']}\nBlood Glucose: ${log['bloodGlucLevel']} mg/dL\nNote: ${log['note']}'),
-            );
-          },
-        ),
       ],
     );
   }

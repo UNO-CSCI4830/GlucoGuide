@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:glucoguide/widgets/insulin_calculator.dart';
-import 'package:glucoguide/widgets/food_search.dart';
+import 'package:glucoguide/insulin_calculator/insulin_calculator.dart';
+import 'package:glucoguide/insulin_calculator/food_search.dart';
 
 class FoodTrackerPage extends StatefulWidget {
   const FoodTrackerPage({super.key});
