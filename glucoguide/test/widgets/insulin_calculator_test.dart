@@ -47,15 +47,20 @@ void main() {
       (WidgetTester tester) async {
     await tester.pumpWidget(testWidgetSetup());
 
+    //finding the glucose TextField
     final glucoseField =
         find.widgetWithText(TextField, 'Blood Glucose (mg/dL)');
+    //"entering" 100 into the glucose TextField
     await tester.enterText(glucoseField, '100');
     await tester.pump();
 
+    //finding the carbs TextField
     final carbsField = find.widgetWithText(TextField, 'Carbs (g)');
+    //"entering" 100 into the carbs TextField
     await tester.enterText(carbsField, '100');
     await tester.pump();
 
+    //verifying the values
     expect(tester.widget<TextField>(glucoseField).controller?.text, '100');
     expect(tester.widget<TextField>(carbsField).controller?.text, '100');
   });
