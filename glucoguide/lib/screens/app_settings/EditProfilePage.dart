@@ -26,27 +26,35 @@ class _EditProfilePage extends State<EditProfilePage> {
 
     final List<EditProfileItems> settings = [
       EditProfileItems(
-          title: 'User Name', fieldName: 'name', text: userProfile!.name),
+          title: 'User Name',
+          fieldName: 'name',
+          text: (userProfile?.name).toString()),
       EditProfileItems(
           title: 'Height',
           fieldName: 'height',
-          text: (userProfile.height).toString() + ' cm'),
+          text: (userProfile?.height).toString() + ' cm'),
       EditProfileItems(
-          title: 'Sex', fieldName: 'gender', text: userProfile.gender),
+          title: 'Sex',
+          fieldName: 'gender',
+          text: (userProfile?.gender).toString()),
       EditProfileItems(
-          title: 'Country', fieldName: 'country', text: userProfile.country),
+          title: 'Country',
+          fieldName: 'country',
+          text: (userProfile?.country).toString()),
       EditProfileItems(
-          title: 'Units', fieldName: 'unit', text: userProfile.unit),
+          title: 'Units',
+          fieldName: 'unit',
+          text: (userProfile?.unit).toString()),
       EditProfileItems(
           title: 'Weight',
           fieldName: 'weight',
-          text: (userProfile.weight).toString()),
+          text: (userProfile?.weight).toString()),
       EditProfileItems(
           title: 'Date of Birth', fieldName: 'dateOfBirth', text: ''),
     ];
     return Card(
         child: StreamBuilder<DocumentSnapshot>(
-      stream: _firestore.collection('users').doc(userProfile.uid).snapshots(),
+      stream: _firestore.collection('users').doc(userProfile?.uid).snapshots(),
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -142,28 +150,6 @@ class _EditProfilePage extends State<EditProfilePage> {
                               );
                             },
                           );
-                        } else if (setting.fieldName == 'unit') {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Select Units'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                      title: Text('lbs'),
-                                      onTap: () {
-                                        updateUserUnits(user, 'lbs');
-                                        setting.text = 'lbs';
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
                         } else if (setting.fieldName == 'name') {
                           showDialog(
                             context: context,
@@ -216,7 +202,7 @@ class _EditProfilePage extends State<EditProfilePage> {
                                     child: Text('OK'),
                                     onPressed: () {
                                       updateHeight(user, inputValue);
-                                      setting.text = inputValue;
+                                      setting.text = inputValue + ' cm';
                                       Navigator.pop(context);
                                     },
                                   ),
