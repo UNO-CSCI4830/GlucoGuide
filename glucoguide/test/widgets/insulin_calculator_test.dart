@@ -118,4 +118,25 @@ void main() {
     // Expected dose = ((100 - 100) / 10) + (10 / 10) = 1
     expect(dose, 1);
   });
+
+  testWidgets('testing error message for invalid glucose input',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(testWidgetSetup());
+
+    final glucoseField =
+        find.widgetWithText(TextField, 'Blood Glucose (mg/dL)');
+    final carbsField = find.widgetWithText(TextField, 'Carbs (g)');
+    final calculateButton =
+        find.widgetWithText(ElevatedButton, 'Calculate Dose');
+
+    // "entering" a negative glucose value and attempting to calculate
+    await tester.enterText(glucoseField, '-100');
+    await tester.enterText(carbsField, '100');
+    await tester.pump();
+    await tester.tap(calculateButton);
+    await tester.pump();
+
+    // Check if error message appears
+    expect(find.text('Please enter a valid glucose value.'), findsOneWidget);
+  });
 }
