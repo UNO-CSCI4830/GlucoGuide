@@ -28,6 +28,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
+                  key: const Key("email"),
                   controller: _emailController,
                   decoration:
                       const InputDecoration(labelText: "Enter your email"),
@@ -37,6 +38,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   }),
               const SizedBox(height: 20),
               ElevatedButton(
+                  key: const Key('ChangePasswordButton'),
                   onPressed: () => _testEmail(context, emailValue),
                   child: const Text('Change Password')),
               const SizedBox(height: 20),

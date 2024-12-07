@@ -30,6 +30,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
             children: [
               Text("Please enter your password to delete your account"),
               TextField(
+                key: const Key('password'),
                 controller: _passwordController,
                 decoration: const InputDecoration(labelText: "Password"),
                 obscureText: true,
@@ -37,6 +38,8 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
               const SizedBox(height: 20),
               ElevatedButton(
                   onPressed: () {
+                    key:
+                    const Key('Delete Account');
                     _confirmAccountDeletion(context);
                   },
                   child: const Text('Delete Account')),
@@ -58,12 +61,16 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
+                key:
+                const Key('NoButton');
                 Navigator.of(context).pop();
               },
               child: Text('No'),
             ),
             TextButton(
               onPressed: () {
+                key:
+                const Key('YesButton');
                 _deleteAccount();
                 const Text('Button yes');
                 Navigator.of(context).pop();
@@ -81,6 +88,8 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
     final User? user = _auth.currentUser;
     final FirebaseFirestore db = FirebaseFirestore.instance;
     try {
+      key:
+      const Key('AccountBeingDeleted');
       await FirebaseAuth.instance.currentUser!.delete();
       db.collection("users").doc(user!.uid).delete().then(
             (doc) => print("Doc deleted"),
