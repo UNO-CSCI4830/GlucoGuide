@@ -16,8 +16,10 @@ class SummaryPage extends StatefulWidget {
 }
 
 class SummaryPageState extends State<SummaryPage> {
+  
   double _a1cGoal = 6.5; 
-  List<BloodGlucoseLog> _glucoseLogs = [];
+  final List<BloodGlucoseLog> _glucoseLogs = [];
+  List<BloodGlucoseLog> get glucoseLogs => _glucoseLogs;
 
   void _updateA1CGoal() async {
   
@@ -28,6 +30,7 @@ class SummaryPageState extends State<SummaryPage> {
         return AlertDialog(
           title: const Text('Set New A1C Goal'),
           content: TextField(
+            key: const Key('a1cGoalField'),
             controller: controller,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
@@ -113,6 +116,7 @@ class SummaryPageState extends State<SummaryPage> {
           ),
         ),
         TextField(
+          key: const Key('glucoseInputField'),
           controller: glucoseController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
@@ -123,9 +127,10 @@ class SummaryPageState extends State<SummaryPage> {
         ),
         SizedBox(height: 10),
         ElevatedButton(
+          key: const Key('addReadingButton'),
           onPressed: () {
             if (glucoseController.text.isNotEmpty) {
-              _addGlucoseReading(double.parse(glucoseController.text));
+              addGlucoseReading(double.parse(glucoseController.text));
               glucoseController.clear();
             }
           },
@@ -136,7 +141,7 @@ class SummaryPageState extends State<SummaryPage> {
     );
   }
 
-void _addGlucoseReading(double level) {
+void addGlucoseReading(double level) {
     setState(() {
     _glucoseLogs.add(BloodGlucoseLog(date: DateTime.now(), level: level));
     });
