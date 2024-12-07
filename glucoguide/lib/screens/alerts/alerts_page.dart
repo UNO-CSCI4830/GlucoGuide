@@ -195,6 +195,7 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
+              key: Key('addNewAlertButton'),
               onPressed: () async {
                 // Navigate to AddAlert page and wait for result
                 final newAlert = await Navigator.push(
