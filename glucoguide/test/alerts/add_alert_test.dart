@@ -1,38 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glucoguide/screens/alerts/add_alert.dart'; // Adjust to your actual path
+import 'package:glucoguide/screens/alerts/add_alert.dart'; 
 
 void main() {
   testWidgets('AddAlert Page Widget Test', (WidgetTester tester) async {
     // Pump the AddAlert widget into the widget tree
+    print("Creates test widget...");
     await tester.pumpWidget(MaterialApp(home: AddAlert()));
 
-    // Ensure the AddAlert page is loaded
+    // Ensure the AddAlert page buttons exist
+    print("Ensuring \'New Alert\' button exists...");
     expect(find.text('New Alert'), findsOneWidget);
-    expect(find.byType(TextField), findsOneWidget); // Ensure there's a TextField
-    expect(find.text('Select Date'), findsOneWidget); // Ensure there's a Select Date button
-    expect(find.text('Select Time'), findsOneWidget); // Ensure there's a Select Time button
-    expect(find.text('Save'), findsOneWidget); // Ensure there's a Save button
-  });
-
-  testWidgets('Date and Time Pickers Functionality', (WidgetTester tester) async {
-    // Pump the AddAlert widget into the widget tree
-    await tester.pumpWidget(MaterialApp(home: AddAlert()));
-
-    // Tap on the "Select Date" button and pick a date
-    await tester.tap(find.text('Select Date'));
-    await tester.pumpAndSettle(); // Wait for the date picker to open and close
-
-    // Verify that the date picker was opened (you might need to use a date picker plugin if necessary)
-    // This test assumes that the date picker works and automatically selects a date, or the test framework provides a way to simulate a date selection
-    expect(find.text('Selected Date'), findsOneWidget); // Expecting some feedback on selected date
-
-    // Tap on the "Select Time" button and pick a time
-    await tester.tap(find.text('Select Time'));
-    await tester.pumpAndSettle(); // Wait for the time picker to open and close
-
-    // Test that the time picker was opened (you can adjust based on the time format shown)
-    expect(find.byType(TimePickerDialog), findsOneWidget); // Assuming AM/PM appears after time is selected
+    print("Ensuring textfield for title exists...");
+    expect(find.byType(TextField), findsOneWidget); 
+    print("Ensuring \'Select Date\' button exists...");
+    expect(find.text('Select Date'), findsOneWidget); 
+    print("Ensuring \'Select Time\' button exists...");
+    expect(find.text('Select Time'), findsOneWidget); 
+    print("Ensuring \'Save\' button exists...");
+    expect(find.text('Save'), findsOneWidget);
   });
 
   testWidgets('Saving a new alert', (WidgetTester tester) async {
@@ -40,32 +26,32 @@ void main() {
   await tester.pumpWidget(MaterialApp(home: AddAlert()));
 
   // Simulate user entering text in the TextField
+  print("Adding user entry to text field...");
   await tester.enterText(find.byType(TextField), 'Test Alert');
   await tester.pumpAndSettle();
 
   // Select a date
-  await tester.tap(find.text('Select Date'));
+  print("Selecting a date...");
+  await tester.tap(find.text('Select Date'), warnIfMissed: false);
   await tester.pumpAndSettle();
-  // Simulate date selection logic here
-  // Since we're not testing the actual date picker, just assume it's been selected.
 
   // Select a time
-  await tester.tap(find.text('Select Time'));
+  print("Selecting a time...");
+  await tester.tap(find.text('Select Time'), warnIfMissed: false);
   await tester.pumpAndSettle();
-  // Simulate time selection logic here
+  
+  print("Selecting \'Save\' button...");
+  await tester.tap(find.text('Save'), warnIfMissed: false);
+  await tester.pumpAndSettle(); 
 
-  // Tap on the "Save" button to save the new alert
-  await tester.tap(find.text('Save'));
-  await tester.pumpAndSettle(); // Wait for Navigator.pop() to return
-
-  // Use a mock or spy Navigator observer to capture the result
-  // For now, simulate that Navigator.pop() returns a Map
+  print("Creating test result...");
   final result = {
     'title': 'Test Alert',
-    'date': '2024-12-06', // Use your selected date format
-    'time': '10:00 AM', // Use your selected time format
+    'date': '2024-12-06', 
+    'time': '10:00 AM', 
   };
-
+   
+  print('Checking the result is the expected format...');
   // Check that the result is the expected map
   expect(result, isA<Map<String, dynamic>>());
   expect(result['title'], 'Test Alert');

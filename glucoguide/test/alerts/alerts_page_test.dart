@@ -54,33 +54,41 @@ void main() {
   group('AlertsPage Tests:', () {
     //Tests displaying mock alerts
     testWidgets("Displays mock alerts", (WidgetTester tester) async {
+      print("Creating mock user provider...");
       final mockProvider = MockUserProvider();
       await tester.pumpWidget(createTestableWidget(mockProvider));
 
       // Ensure that the ListView contains the correct number of ListTiles
+      print("Ensuring there are two alerts in the list...");
       expect(find.byType(ListTile), findsNWidgets(2));
       // Verify that the mock alerts are displayed
+      print("Ensuring \'Mock Alert 1\' is included...");
       expect(find.text('Mock Alert 1'), isNotNull);
+      print("Ensuring \'Mock Alert 2\' is included...");
       expect(find.text('Mock Alert 2'), isNotNull);
     });
-  });
+  
 
   //Test adding a new alert
-testWidgets('Adds a new alert', (WidgetTester tester) async {
+  testWidgets('Adds a new alert', (WidgetTester tester) async {
+  print("Creating mock user provider...");
   final mockProvider = MockUserProvider();
   await tester.pumpWidget(createTestableWidget(mockProvider));
 
-  // Trigger the add alert action (assuming there's a button with the key 'Add New Alert')
+  // Trigger the add alert action 
+  print("Triggering the add alert button...");
   await tester.tap(find.byKey(Key('addNewAlertButton')));
   await tester.pumpAndSettle();
 
-  // Now, simulate the alert addition
-      final newAlert = {'title': 'New Alert', 'date': '2024-12-08', 'time': '4:00 PM'};
-      mockProvider.updateUserProfile({
-        'alerts': [...mockProvider.mockAlerts, newAlert]
-      });
+  // Add fake alert
+  print("Adding mock alert...");
+  final newAlert = {'title': 'New Alert', 'date': '2024-12-08', 'time': '4:00 PM'};
+  mockProvider.updateUserProfile({
+      'alerts': [...mockProvider.mockAlerts, newAlert]
+  });
   await tester.pumpAndSettle();
-  // Assuming the alert's title is updated dynamically to 'New Alert'
+  // Checking new alert is added
+  print("Ensuring \'New Alert\' was created...");
   expect(find.text('New Alert'), isNotNull);
 });
 
@@ -103,14 +111,18 @@ testWidgets('Adds a new alert', (WidgetTester tester) async {
 });*/
 
  testWidgets("Navigates to EditAlert page", (WidgetTester tester) async {
+      print("Creaing mock user provider...");
       final mockProvider = MockUserProvider();
       await tester.pumpWidget(createTestableWidget(mockProvider));
 
       // Tap on an alert to edit
+      print("Selecting mock alert...");
       await tester.tap(find.text('Mock Alert 1'));
       await tester.pumpAndSettle();
 
       // Verify that the EditAlert page is displayed
+      print("Ensuring page navigates to \'EditAlert\' page...");
       expect(find.byType(EditAlert), findsOneWidget);
     });
+});
 }
