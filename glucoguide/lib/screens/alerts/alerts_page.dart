@@ -19,12 +19,12 @@ class _AlertsPageState extends State<AlertsPage> {
 
   @override void initState(){
     super.initState();
-    //initializeNotifications();
-    //initializeFCM();
+    initializeNotifications();
+    initializeFCM();
   }
 
     // Initialize Local Notifications
-  /*void initializeNotifications() async {
+  void initializeNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher'); // Your app icon
 
@@ -107,7 +107,7 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     return List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
   }
-*/
+
 
   // Function to delete an alert
   void _deleteAlert(Map<String, dynamic> alert) {
