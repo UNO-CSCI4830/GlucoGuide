@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_charts/flutter_charts.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class BloodGlucoseLog {
   final DateTime date;
@@ -17,7 +17,7 @@ class SummaryPage extends StatefulWidget {
 
 class SummaryPageState extends State<SummaryPage> {
   double _a1cGoal = 6.5; 
-  List<BloodGlucoseLog> _glucoseLogs = [];
+  final List<BloodGlucoseLog> _glucoseLogs = [];
 
   void _updateA1CGoal() async {
   
@@ -53,12 +53,17 @@ class SummaryPageState extends State<SummaryPage> {
     }
   }
 
+  void _addGlucoseReading(double level) {
+    setState(() {
+    _glucoseLogs.add(BloodGlucoseLog(date: DateTime.now(), level: level));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-            title: const Text('Summary'),
+        title: const Text('Summary'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -66,11 +71,12 @@ class SummaryPageState extends State<SummaryPage> {
           },
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+        child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -87,18 +93,56 @@ class SummaryPageState extends State<SummaryPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 20), 
+            const SizedBox(height: 20),
             _buildGlucoseEntryUI(),
-            _buildGlucoseLogList(),
-
-            Expanded(
-              child: chartToRun(), 
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 300, 
+              child: chartToRun(),
             ),
+            const SizedBox(height: 20),
+            if (_glucoseLogs.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 92, 16, 16).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8.0), 
+                  border: Border.all(color: Color.fromARGB(255, 92, 16, 16), width: 1),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Most Recent Blood Glucose:",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "${_glucoseLogs.last.level} mg/dL",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      "Logged at: ${_formatTime(_glucoseLogs.last.date)}",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}          
+           
 
   Widget _buildGlucoseEntryUI() {
     TextEditingController glucoseController = TextEditingController();
@@ -136,61 +180,120 @@ class SummaryPageState extends State<SummaryPage> {
     );
   }
 
-void _addGlucoseReading(double level) {
-    setState(() {
-    _glucoseLogs.add(BloodGlucoseLog(date: DateTime.now(), level: level));
-    });
-  }
+  String _formatTime(DateTime time) {
+  final hour = time.hour % 12 == 0 ? 12 : time.hour % 12;
+  final period = time.hour >= 12 ? "PM" : "AM";
+  final minute = time.minute.toString().padLeft(2, '0');
+  return "$hour:$minute $period";
+}
 
-  Widget _buildGlucoseLogList() {
+// _addGlucoseReading was here before
+// _buildGlucoseLogList was here
 
-
-
-    return Expanded(
-      child: ListView.builder(
-        itemCount: _glucoseLogs.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text("${_glucoseLogs[index].level} mg/dL",
-            style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),           
-            ),
-            subtitle: Text(_glucoseLogs[index].date.toIso8601String(),
-            style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
-            ),
-            tileColor: Color.fromARGB(255, 92, 16, 16),
-          );
-        },
-      ),
-    );
-  }
-
-
+  // chart help from fl_chart community
   Widget chartToRun() {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: LineChart(
+      LineChartData(
+        gridData: FlGridData(
+          show: true,
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: Colors.grey.withOpacity(0.5),
+              strokeWidth: 1,
+            );
+          },
+          getDrawingVerticalLine: (value) {
+            return FlLine(
+              color: Colors.grey.withOpacity(0.5),
+              strokeWidth: 1,
+            );
+          },
+        ),
+        titlesData: FlTitlesData(
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: 100,
+              getTitlesWidget: (value, meta) {
+                if (value % 100 == 0) {
+                  return Text(
+                    value.toInt().toString(),
+                    style: const TextStyle(fontSize: 12),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: 1,
+              getTitlesWidget: (value, meta) {
+                if (value.toInt() < _glucoseLogs.length) {
+                  final log = _glucoseLogs[value.toInt()];
+                  return Text(
+                    _formatHour(log.date),
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                  );
+                }
+                return const Text(""); 
+              },
+            ),
+          ),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false), 
+          ),
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+        ),
+        borderData: FlBorderData(
+          show: true,
+          border: Border.all(color: Colors.black, width: 1),
+        ),
+        minX: 0,
+        maxX: _glucoseLogs.isEmpty ? 0 : _glucoseLogs.length.toDouble() - 1,
+        minY: 0,
+        maxY: 500,
+        lineBarsData: [
+          LineChartBarData(
+            spots: _glucoseLogs
+                .asMap()
+                .entries
+                .map((e) => FlSpot(e.key.toDouble(), e.value.level))
+                .toList(),
+            isCurved: true,
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromARGB(255, 92, 16, 16),
+                const Color.fromARGB(255, 92, 16, 16),
+              ],
+            ),
+            barWidth: 3,
+            isStrokeCapRound: true,
+            belowBarData: BarAreaData(
+              show: true,
+              gradient: LinearGradient(
+                colors: [
+                  const Color.fromARGB(255, 92, 16, 16).withOpacity(0.2),
+                  const Color.fromARGB(255, 158, 55, 55).withOpacity(0.1),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
-    var chartOptions = ChartOptions();
-
-    
-    var chartData = ChartData(
-      dataRows: [
-        [10.0, 20.0, 30.0, 40.0, 50.0], 
-        [15.0, 25.0, 35.0, 45.0, 55.0], 
-      ],
-      xUserLabels: ["Jan", "Feb", "Mar", "Apr", "May"], 
-      dataRowsLegends: ["Line 1", "Line 2"], 
-      chartOptions: chartOptions, 
-    );
-
-    var lineChartContainer = LineChartTopContainer(
-      chartData: chartData,
-    );
-
-    var lineChartPainter = LineChartPainter(
-      lineChartContainer: lineChartContainer,
-    );
-
-    return LineChart(
-      painter: lineChartPainter,
-      size: const Size(400, 300), 
-    );
-  }
+String _formatHour(DateTime date) {
+  final hour = date.hour % 12 == 0 ? 12 : date.hour % 12;
+  final minute = date.minute.toString().padLeft(2, '0');
+  final period = date.hour >= 12 ? "PM" : "AM";
+  return "$hour:$minute $period";
+}
 }
