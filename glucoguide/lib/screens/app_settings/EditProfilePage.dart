@@ -201,6 +201,7 @@ class _EditProfilePage extends State<EditProfilePage> {
                               return AlertDialog(
                                 title: Text('Enter Change'),
                                 content: TextField(
+                                  keyboardType: TextInputType.number,
                                   onChanged: (value) {
                                     inputValue = value;
                                   },
@@ -215,7 +216,7 @@ class _EditProfilePage extends State<EditProfilePage> {
                                   TextButton(
                                     child: Text('OK'),
                                     onPressed: () {
-                                      updateHeight(user, inputValue);
+                                      updateWeight(user, inputValue);
                                       setting.text = inputValue;
                                       Navigator.pop(context);
                                     },
@@ -261,6 +262,7 @@ class _EditProfilePage extends State<EditProfilePage> {
                               return AlertDialog(
                                 title: Text('Enter Change'),
                                 content: TextField(
+                                  keyboardType: TextInputType.number,
                                   onChanged: (value) {
                                     inputValue = value;
                                   },
@@ -311,9 +313,12 @@ class _EditProfilePage extends State<EditProfilePage> {
     });
   }
 
-  Future updateHeight(User? user, String newHeight) async {
+  Future<void> updateHeight(User? user, String newHeight) async {
+    // Convert height to an integer before saving
+    final heightValue =
+        int.tryParse(newHeight) ?? 0; // Default to 0 if parsing fails
     await _firestore.collection('users').doc(user?.uid).update({
-      'height': newHeight,
+      'height': heightValue,
     });
   }
 
@@ -323,9 +328,12 @@ class _EditProfilePage extends State<EditProfilePage> {
     });
   }
 
-  Future updateWeight(User? user, String newWeight) async {
+  Future<void> updateWeight(User? user, String newWeight) async {
+    // Convert weight to an integer before saving
+    final weightValue =
+        int.tryParse(newWeight) ?? 0; // Default to 0 if parsing fails
     await _firestore.collection('users').doc(user?.uid).update({
-      'weight': newWeight,
+      'weight': weightValue,
     });
   }
 
