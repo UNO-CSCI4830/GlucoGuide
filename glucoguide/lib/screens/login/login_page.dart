@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(builder: (context) => const MainWrapper()),
       );
     } catch (e) {
-      // Handle errors and display an appropriate message
+      // Handle errors and display
       setState(() {
         _status = 'Sign-In Error: $e';
       });
