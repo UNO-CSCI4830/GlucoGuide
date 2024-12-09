@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/nutritionx_service.dart';
+import 'package:glucoguide/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class FoodSearchWidget extends StatefulWidget {
   const FoodSearchWidget({Key? key}) : super(key: key);
@@ -40,20 +42,27 @@ class _FoodSearchWidgetState extends State<FoodSearchWidget> {
   void _viewFoodDetails(String itemId) async {
     try {
       final details = await _service.getFoodDetails(itemId);
+
+      // Extract food details into variables
+      final foodName = details['food_name'] ?? 'Unknown';
+      final calories = details['nf_calories'] ?? 0;
+      final protein = details['nf_protein'] ?? 0;
+      final carbohydrates = details['nf_total_carbohydrate'] ?? 0;
+      final fat = details['nf_total_fat'] ?? 0;
+
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text(details['food_name'] ?? 'Unknown'),
+            title: Text(foodName),
             content: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Calories: ${details['nf_calories'] ?? 'N/A'} kcal'),
-                Text('Protein: ${details['nf_protein'] ?? 'N/A'} g'),
-                Text(
-                    'Carbohydrates: ${details['nf_total_carbohydrate'] ?? 'N/A'} g'),
-                Text('Fat: ${details['nf_total_fat'] ?? 'N/A'} g'),
+                Text('Calories: $calories kcal'),
+                Text('Protein: $protein g'),
+                Text('Carbohydrates: $carbohydrates g'),
+                Text('Fat: $fat g'),
               ],
             ),
             actions: [
@@ -63,7 +72,32 @@ class _FoodSearchWidgetState extends State<FoodSearchWidget> {
               ),
               ElevatedButton(
                 onPressed: () {
+                  final foodLog = {
+                    'time': DateTime.now().toString(),
+                    'food_name': foodName,
+                    'calories': calories,
+                    'protein': protein,
+                    'carbohydrates': carbohydrates,
+                    'fat': fat,
+                  };
+
+                  // Log food entry
+                  final userProvider =
+                      Provider.of<UserProvider>(context, listen: false);
+
+                  // Retrieve and update food logs
+                  final currentLogs = List<Map<String, dynamic>>.from(
+                      userProvider.userProfile?.foodLogs ?? []);
+                  currentLogs.add(foodLog);
+
+                  // Update profile
+                  userProvider.updateUserProfile({'foodLogs': currentLogs});
+
                   Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Food added to tracking log!')),
+                  );
                 },
                 child: const Text('Add to Log'),
               ),
