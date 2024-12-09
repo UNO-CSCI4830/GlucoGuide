@@ -145,7 +145,7 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
     final currentAlerts =
         List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
     final index = currentAlerts.indexWhere(
-        (a) => a['title'] == updatedAlert['title']); // Use title as identifier
+        (a) => a['id'] == updatedAlert['id']); // Use title as identifier
     if (index != -1) {
       currentAlerts[index] = updatedAlert;
       userProvider.updateUserProfile({'alerts': currentAlerts});

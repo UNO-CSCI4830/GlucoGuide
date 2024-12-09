@@ -90,7 +90,7 @@ class edit_alert extends State<EditAlert> {
 
     // Update the alert locally in alertsList
     final updatedAlertsList = List<Map<String, dynamic>>.from(widget.alertsList);
-    final index = updatedAlertsList.indexWhere((alert) => alert['title'] == widget.alert['title']);
+    final index = updatedAlertsList.indexWhere((alert) => alert['id'] == updatedAlert['id']);
     if ( index != -1){
       updatedAlertsList[index] = updatedAlert;
     }
@@ -105,15 +105,13 @@ class edit_alert extends State<EditAlert> {
   }
 
   Future<void> _deleteAlert() async {
-    try {
       // Call the onDelete callback (optional)
       widget.onDelete(widget.alert);
-
+      ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Alert deleted'), duration: Duration(seconds: 2),),
+      );
       // Navigate back to the AlertsPage
       Navigator.pop(context);
-    } catch (e) {
-      print('Failed to delete alert: $e');
-    }
   }
 
   @override
