@@ -29,6 +29,13 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
     });
   }
 
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: const Color.fromARGB(255, 228, 139, 133),
+    ));
+  }
+
   void calculateDose() {
     final glucose = double.tryParse(glucoseController.text) ?? 0.0;
     final carbs = double.tryParse(carbsController.text) ?? 0.0;
@@ -37,6 +44,27 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
     final carbRatio = double.tryParse(carbRatioController.text) ?? 10.0;
     final targetGlucose =
         double.tryParse(targetGlucoseController.text) ?? 100.0;
+
+    if (glucose == null || glucose < 0) {
+      _showError("Please enter a valid glucose value.");
+      return;
+    }
+    if (carbs == null || carbs < 0) {
+      _showError("Please enter a valid carb value.");
+      return;
+    }
+    if (sensitivityFactor == null || sensitivityFactor <= 0) {
+      _showError("Sensitivity factor must be greater than 0.");
+      return;
+    }
+    if (carbRatio == null || carbRatio <= 0) {
+      _showError("Carb ratio must be greater than 0.");
+      return;
+    }
+    if (targetGlucose == null || targetGlucose < 0) {
+      _showError("Please enter a valid target glucose value.");
+      return;
+    }
 
     setState(() {
       insulinDose =
