@@ -27,7 +27,7 @@ class Add_Alert extends State<AddAlert> {
       ScaffoldMessenger.of(context).showSnackBar(
         //Display message to show success
         SnackBar(
-            content: Text('Selected Date')),
+            content: Text('Selected Date'), duration: Duration(seconds: 2),),
       );
     }
   }
@@ -47,7 +47,7 @@ class Add_Alert extends State<AddAlert> {
       ScaffoldMessenger.of(context).showSnackBar(
         //Display message to show success
         SnackBar(
-            content: Text('Selected Time')),
+            content: Text('Selected Time'), duration: Duration(seconds: 2),),
       );
     }
   }

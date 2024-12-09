@@ -145,7 +145,7 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
     final currentAlerts =
         List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
     final index = currentAlerts.indexWhere(
-        (a) => a['id'] == updatedAlert['id']); // Use title as identifier
+        (alert) => alert['title'] == updatedAlert['title']); // Use title as identifier
     if (index != -1) {
       currentAlerts[index] = updatedAlert;
       userProvider.updateUserProfile({'alerts': currentAlerts});
@@ -155,28 +155,30 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
   }
 
   // Function to navigate to EditAlert page
-  void _editAlert(Map<String, dynamic> alert) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditAlert(
-          alert: alert,
-          onDelete: _deleteAlert, // Pass the delete function
-          alertID: alert['title'], // Use title as identifier
-          alertsList: List<Map<String, dynamic>>.from(
-              Provider.of<UserProvider>(context, listen: false)
-                      .userProfile
-                      ?.alerts ??
-                  []), // Pass the actual alerts list
-          onUpdateAlertsList: (updatedList) {
-            // Update the UserProfile alerts list using the UserProvider
+  void _editAlert(Map<String, dynamic> alert, int index) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditAlert(
+        alert: alert,
+        alertIndex: index, // Pass index instead of alertID
+        alertsList: List<Map<String, dynamic>>.from(
             Provider.of<UserProvider>(context, listen: false)
-                .updateUserProfile({'alerts': updatedList});
-          },
-        ),
+                    .userProfile
+                    ?.alerts ??
+                []),
+        onDelete: (alert) {
+          _deleteAlert(alert);
+        },
+        onUpdateAlertsList: (updatedList) {
+          Provider.of<UserProvider>(context, listen: false)
+              .updateUserProfile({'alerts': updatedList});
+          setState(() {});
+        },
       ),
-    );
-  }
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +227,7 @@ static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) 
                           builder: (context) => EditAlert(
                             alert: alert,
                             onDelete: _deleteAlert, // Handle deletion
-                            alertID: alert['title'], // Use title as identifier
+                            alertIndex: index, // Use title as identifier
                             alertsList: alertsList, // Pass alerts list
                             onUpdateAlertsList: (updatedList) {
                               // Update alerts list in UserProvider

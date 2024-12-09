@@ -1,11 +1,12 @@
 //lib//pages/edit_alert.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EditAlert extends StatefulWidget {
   final Map<String, dynamic> alert;
   final Function(Map<String, dynamic>) onDelete;
-  final String alertID;
+  final int alertIndex;
   final List<Map<String, dynamic>> alertsList; // Pass alertsList here
   final Function(List<Map<String, dynamic>>) onUpdateAlertsList; // Callback for parent state
 
@@ -13,7 +14,7 @@ class EditAlert extends StatefulWidget {
     Key? key,
     required this.alert,
     required this.onDelete,
-    required this.alertID,
+    required this.alertIndex,
     required this.alertsList,
     required this.onUpdateAlertsList,
   }) : super(key: key);
@@ -30,8 +31,6 @@ class edit_alert extends State<EditAlert> {
   @override
   void initState() {
     super.initState();
-    assert(widget.alertID != null && widget.alertID.isNotEmpty,
-        "Alert ID is required");
     alert_name.text = widget.alert['title'] ?? '';
     selected_date.text = widget.alert['date'] ?? '';
     selected_time.text = widget.alert['time'] ?? '';
@@ -67,42 +66,42 @@ class edit_alert extends State<EditAlert> {
   }
 
 
-  // Function to update the alert in Firebase
-  Future<void> _updateAlert() async {
-    try {
-      // Reference to the alert document in Firestore
-    final alertRef =
-        FirebaseFirestore.instance.collection('alerts').doc(widget.alertID);
-
-    // Update alert in Firestore
-    await alertRef.update({
-      'title': alert_name.text.isNotEmpty ? alert_name.text : '',
-      'date': selected_date.text.isNotEmpty ? selected_date.text : '',
-      'time': selected_time.text.isNotEmpty ? selected_time.text : '',
-    });
-
-    final updatedAlert = {
-      'title': alert_name.text,
-      'date' : selected_date.text,
-      'time' : selected_time.text,
-      'id' : widget.alertID,
-    };
+// Function to update alert in Firestore and locally
+Future<void> _updateAlert() async {
+  try {
+    // Get the current user's UID
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      print('User is not authenticated');
+      return;
+    }
 
     // Update the alert locally in alertsList
+    final updatedAlert = {
+      'title': alert_name.text,
+      'date': selected_date.text,
+      'time': selected_time.text,
+    };
+
     final updatedAlertsList = List<Map<String, dynamic>>.from(widget.alertsList);
-    final index = updatedAlertsList.indexWhere((alert) => alert['id'] == updatedAlert['id']);
-    if ( index != -1){
-      updatedAlertsList[index] = updatedAlert;
-    }
-    // Call the parent widget's callback to update alertsList
+    updatedAlertsList[widget.alertIndex] = updatedAlert;
+
+    // Update Firestore with the correct user ID
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(userId); // Use dynamic userId
+    await userDocRef.update({'alerts': updatedAlertsList});
+
+    // Update parent state
     widget.onUpdateAlertsList(updatedAlertsList);
 
-      Navigator.pop(context, updatedAlert);
-    } catch (e) {
-      // Handle error
-      print('Failed to update alert: $e');
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Alert updated'), duration: Duration(seconds: 2),),
+      );
+    // Navigate back with updated alert
+    Navigator.pop(context, updatedAlert);
+  } catch (e) {
+    print('Failed to update alert: $e');
   }
+}
 
   Future<void> _deleteAlert() async {
       // Call the onDelete callback (optional)
