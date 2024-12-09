@@ -40,10 +40,9 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
     final glucose = double.tryParse(glucoseController.text) ?? 0.0;
     final carbs = double.tryParse(carbsController.text) ?? 0.0;
     final sensitivityFactor =
-        double.tryParse(sensitivityFactorController.text) ?? 50.0;
-    final carbRatio = double.tryParse(carbRatioController.text) ?? 10.0;
-    final targetGlucose =
-        double.tryParse(targetGlucoseController.text) ?? 100.0;
+        double.tryParse(sensitivityFactorController.text) ?? 0.0;
+    final carbRatio = double.tryParse(carbRatioController.text) ?? 0.0;
+    final targetGlucose = double.tryParse(targetGlucoseController.text) ?? 0.0;
 
     if (glucose == null || glucose < 0) {
       _showError("Please enter a valid glucose value.");
