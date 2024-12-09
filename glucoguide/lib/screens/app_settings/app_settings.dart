@@ -8,7 +8,6 @@ import 'package:glucoguide/screens/app_settings/DeleteAccountPage.dart';
 import 'package:glucoguide/screens/app_settings/EditProfilePage.dart';
 import 'package:glucoguide/screens/app_settings/NotificationSettingsPage.dart';
 import 'package:glucoguide/screens/app_settings/PrivacyCenterPage.dart';
-import 'package:glucoguide/screens/app_settings/PushNotificationPage.dart';
 import 'package:glucoguide/screens/app_settings/ReminderPage.dart';
 import 'package:glucoguide/screens/login/login_page.dart';
 import 'package:provider/provider.dart';
@@ -67,7 +66,6 @@ class _MyAccountState extends State<AppSettingsPage> {
       SettingItem(
         title: 'Log Out',
         icon: Icons.logout_rounded,
-        // make this secure
         nextPage: null,
       ),
       SettingItem(
@@ -86,12 +84,7 @@ class _MyAccountState extends State<AppSettingsPage> {
         nextPage: PrivacyCenterPage(),
       ),
       SettingItem(
-        title: 'Push Notifications',
-        icon: Icons.notifications,
-        nextPage: PushNotificationPage(),
-      ),
-      SettingItem(
-        // Index = 9
+        // Index = 8
         title: 'Help',
         nextPage: NotificationSettingsPage(),
       ),
@@ -130,7 +123,7 @@ class _MyAccountState extends State<AppSettingsPage> {
                         fontSize: 18,
                       )));
             }
-            if (index == 9) {
+            if (index == 8) {
               return Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Text('Help',
