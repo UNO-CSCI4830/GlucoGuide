@@ -13,11 +13,9 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
   final TextEditingController glucoseController = TextEditingController();
   final TextEditingController carbsController = TextEditingController();
   final TextEditingController sensitivityFactorController =
-      TextEditingController(text: '50');
-  final TextEditingController carbRatioController =
-      TextEditingController(text: '10');
-  final TextEditingController targetGlucoseController =
-      TextEditingController(text: '100');
+      TextEditingController();
+  final TextEditingController carbRatioController = TextEditingController();
+  final TextEditingController targetGlucoseController = TextEditingController();
 
   double insulinDose = 0.0;
   bool canCalculateDose = false;
