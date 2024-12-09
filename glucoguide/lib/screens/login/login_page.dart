@@ -31,16 +31,19 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
+              key: const Key('emailField'),
               controller: _emailController,
               decoration: const InputDecoration(labelText: 'Email'),
             ),
             TextField(
+              key: const Key('passwordField'),
               controller: _passwordController,
               decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              key: const Key('signInButton'),
               onPressed: _signInUser,
               child: const Text('Sign In'),
             ),
@@ -60,24 +63,40 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _signInUser() async {
     try {
+      // Sign in the user with email and password
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
+      // Check if the userCredential and user are valid
+      final user = userCredential.user;
+      if (user == null) {
+        throw Exception("User credential is null. Unable to sign in.");
+      }
+
       // Load the user profile into the provider
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      await userProvider.loadUserProfile(userCredential.user!.uid);
+      await userProvider.loadUserProfile(user.uid);
 
-      // Navigate to MainWrapper
-      Navigator.push(
+      // Ensure the profile was successfully loaded
+      if (userProvider.userProfile == null) {
+        throw Exception("Failed to load user profile. Please try again.");
+      }
+
+      // Navigate to MainWrapper after successful profile loading
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const MainWrapper()),
       );
     } catch (e) {
+      // Handle errors and display
       setState(() {
         _status = 'Sign-In Error: $e';
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign-In Error: ${e.toString()}')),
+      );
     }
   }
 }

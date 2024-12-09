@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:glucoguide/providers/user_provider.dart';
 import 'package:glucoguide/screens/app_settings/AboutUsPage.dart';
 import 'package:glucoguide/screens/app_settings/ChangePasswordPage.dart';
 import 'package:glucoguide/screens/app_settings/ContactSupportPage.dart';
@@ -9,12 +11,34 @@ import 'package:glucoguide/screens/app_settings/PrivacyCenterPage.dart';
 import 'package:glucoguide/screens/app_settings/PushNotificationPage.dart';
 import 'package:glucoguide/screens/app_settings/ReminderPage.dart';
 import 'package:glucoguide/screens/login/login_page.dart';
+import 'package:provider/provider.dart';
 
 class AppSettingsPage extends StatefulWidget {
   const AppSettingsPage({super.key});
 
   @override
   State<AppSettingsPage> createState() => _MyAccountState();
+}
+
+Future<void> _handleLogout(BuildContext context) async {
+  try {
+    // Sign out the user from Firebase
+    await FirebaseAuth.instance.signOut();
+
+    // Clear the UserProvider state
+    Provider.of<UserProvider>(context, listen: false).clearUserProfile();
+
+    // Navigate to the login page
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false, // Remove all previous routes
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error logging out: $e')),
+    );
+  }
 }
 
 class _MyAccountState extends State<AppSettingsPage> {
@@ -44,7 +68,7 @@ class _MyAccountState extends State<AppSettingsPage> {
         title: 'Log Out',
         icon: Icons.logout_rounded,
         // make this secure
-        nextPage: LoginPage(),
+        nextPage: null,
       ),
       SettingItem(
         // Index = 5
@@ -119,12 +143,16 @@ class _MyAccountState extends State<AppSettingsPage> {
               leading: Icon(setting.icon),
               title: Text(setting.title),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => setting.nextPage,
-                  ),
-                );
+                if (setting.nextPage == null) {
+                  _handleLogout(context);
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => setting.nextPage!,
+                    ),
+                  );
+                }
               },
             );
           }),
@@ -137,11 +165,11 @@ class _MyAccountState extends State<AppSettingsPage> {
 class SettingItem {
   final String title;
   final IconData? icon;
-  final Widget nextPage;
+  final Widget? nextPage;
 
   SettingItem({
     required this.title,
     this.icon,
-    required this.nextPage,
+    this.nextPage,
   });
 }
