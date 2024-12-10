@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:glucoguide/providers/user_provider.dart';
+import 'package:provider/provider.dart';
+import 'add_alert.dart';
+import 'edit_alert.dart';
+import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class AlertsPage extends StatefulWidget {
   const AlertsPage({super.key});
@@ -8,24 +15,177 @@ class AlertsPage extends StatefulWidget {
 }
 
 class _AlertsPageState extends State<AlertsPage> {
-  final List<Map<String, dynamic>> _alerts = []; // List to store alerts
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  @override void initState(){
+    super.initState();
+    initializeNotifications();
+    initializeFCM();
+  }
+
+    // Initialize Local Notifications
+  void initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher'); // Your app icon
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+      // Handle notification tapped logic here
+      if (response.payload != null) {
+        print('Notification payload: ${response.payload}');
+        final alerts = jsonDecode(response.payload!);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.updateUserProfile({'alerts': alerts});
+        setState(() {});
+      }
+      },
+    );
+  }
+
+  Future<void> initializeFCM() async{
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  //Request notification permissions
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+ FirebaseMessaging.onMessage.listen((RemoteMessage message){
+    if(message.data.containsKey('alerts')){
+      final newAlerts = List<Map<String, dynamic>>.from(
+        jsonDecode(message.data['alerts']),
+      );
+
+
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.updateUserProfile({'alerts': newAlerts});
+      setState(() {});
+    }
+
+      _showNotification(message);
+  
+  });
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+}
+
+
+static Future<void> _firebaseMessagingBackgroundHandler( RemoteMessage message) async {
+    print('Handling a background message: ${message.messageId}');
+  }
+
+// Function to display the notification
+  Future<void> _showNotification(RemoteMessage message) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'alerts_channel', // Channel ID
+      'Alerts Notifications', // Channel Name
+      channelDescription: 'Channel for alert notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID (you can use any unique ID)
+      message.notification?.title ?? 'Alert', // Notification title
+      message.notification?.body ?? 'You have a new alert', // Notification body
+      platformChannelSpecifics,
+      payload: message.data['alerts'], // Optional: payload can contain additional data
+    );
+  }
+
+// Fetch alerts from UserProvider
+  Future<List<Map<String, dynamic>>> fetchAlerts(BuildContext context) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    return List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+  }
+
+
+  // Function to delete an alert
+  void _deleteAlert(Map<String, dynamic> alert) {
+    // Access UserProvider
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Remove the alert from the provider
+    final currentAlerts =
+        List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+    currentAlerts.removeWhere(
+        (a) => a['title'] == alert['title']); // Use title as identifier
+    userProvider.updateUserProfile({'alerts': currentAlerts});
+
+    setState(() {}); // Update the UI
+  }
 
   // Function to add an alert to the list
   void _addAlert(Map<String, dynamic> alert) {
-    setState(() {
-      _alerts.add(alert);
-    });
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Add the alert to the provider
+    final currentAlerts =
+        List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+    currentAlerts.add(alert);
+    userProvider.updateUserProfile({'alerts': currentAlerts});
+
+    setState(() {}); // Update the UI
   }
 
   // Function to update an alert in the list
-  void _updateAlert(int index, Map<String, dynamic> updatedAlert) {
-    setState(() {
-      _alerts[index] = updatedAlert;
-    });
+  void _updateAlert(Map<String, dynamic> updatedAlert) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Update the alert in the provider
+    final currentAlerts =
+        List<Map<String, dynamic>>.from(userProvider.userProfile?.alerts ?? []);
+    final index = currentAlerts.indexWhere(
+        (alert) => alert['title'] == updatedAlert['title']); // Use title as identifier
+    if (index != -1) {
+      currentAlerts[index] = updatedAlert;
+      userProvider.updateUserProfile({'alerts': currentAlerts});
+    }
+
+    setState(() {}); // Update the UI
   }
+
+  // Function to navigate to EditAlert page
+  void _editAlert(Map<String, dynamic> alert, int index) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditAlert(
+        alert: alert,
+        alertIndex: index, // Pass index instead of alertID
+        alertsList: List<Map<String, dynamic>>.from(
+            Provider.of<UserProvider>(context, listen: false)
+                    .userProfile
+                    ?.alerts ??
+                []),
+        onDelete: (alert) {
+          _deleteAlert(alert);
+        },
+        onUpdateAlertsList: (updatedList) {
+          Provider.of<UserProvider>(context, listen: false)
+              .updateUserProfile({'alerts': updatedList});
+          setState(() {});
+        },
+      ),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final userProfile = userProvider.userProfile;
+    final alertsList = userProfile?.alerts ?? [];
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
@@ -41,7 +201,7 @@ class _AlertsPageState extends State<AlertsPage> {
                 // Navigate to AddAlert page and wait for result
                 final newAlert = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddAlert()),
+                  MaterialPageRoute(builder: (context) => const AddAlert()),
                 );
                 if (newAlert != null) {
                   _addAlert(newAlert); // Add new alert to the list
@@ -53,222 +213,38 @@ class _AlertsPageState extends State<AlertsPage> {
             // Display the alerts
             Expanded(
               child: ListView.builder(
-                itemCount: _alerts.length,
+                itemCount: alertsList.length,
                 itemBuilder: (context, index) {
-                  final alert = _alerts[index];
+                  final alert = alertsList[index];
                   return ListTile(
-                      title: Text(alert['title']),
-                      subtitle: Text(
-                          'Date: ${alert['date']}, Time: ${alert['time']}'),
-                      onTap: () async {
-                        //Navigate to edit_alert page and wait for input
-                        final updated_alert = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditAlert(alert: alert),
+                    title: Text(alert['title']),
+                    subtitle:
+                        Text('Date: ${alert['date']}, Time: ${alert['time']}'),
+                    onTap: () async {
+                      final updatedAlert = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditAlert(
+                            alert: alert,
+                            onDelete: _deleteAlert, // Handle deletion
+                            alertIndex: index, // Use title as identifier
+                            alertsList: alertsList, // Pass alerts list
+                            onUpdateAlertsList: (updatedList) {
+                              // Update alerts list in UserProvider
+                              userProvider
+                                  .updateUserProfile({'alerts': updatedList});
+                            },
                           ),
-                        );
-                        if (updated_alert != null) {
-                          _updateAlert(index, updated_alert);
-                        }
-                      });
+                        ),
+                      );
+                      if (updatedAlert != null) {
+                        _updateAlert(updatedAlert); // Update the alert
+                      }
+                    },
+                  );
                 },
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AddAlert extends StatefulWidget {
-  const AddAlert({super.key});
-
-  @override
-  Add_Alert createState() => Add_Alert();
-}
-
-// Page to handle making new alerts
-class Add_Alert extends State<AddAlert> {
-  final TextEditingController _alertName = TextEditingController();
-  DateTime? selectedDate; //variable to hold user selected date
-  String? selectedTime;
-
-  //Function to pick date
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null) {
-      selectedDate = picked; //Store the selected date
-      ScaffoldMessenger.of(context).showSnackBar(
-        //Display message to show success
-        SnackBar(
-            content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
-      );
-    }
-  }
-
-// Function to pick time
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (pickedTime != null) {
-      setState(
-        () {
-          selectedTime = pickedTime.format(context);
-        },
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('New Alert')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              //Title of the alert
-              controller: _alertName,
-              decoration: const InputDecoration(labelText: 'Title'),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              //Date selector
-              onPressed: () => _selectDate(context),
-              child: const Text('Select Date'),
-            ),
-            const SizedBox(height: 8), // Space between date and time button
-            ElevatedButton(
-              onPressed: () => _selectTime(context),
-              child: const Text('Select Time'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                if (selectedDate != null && selectedTime != null) {
-                  final newAlert = {
-                    'title': _alertName.text,
-                    'date': selectedDate!.toLocal().toString().split(' ')[0],
-                    'time': selectedTime,
-                  };
-                  Navigator.pop(context, newAlert);
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-//page to edit existing alert
-class EditAlert extends StatefulWidget {
-  final Map<String, dynamic> alert;
-  const EditAlert({required this.alert, super.key});
-
-  @override
-  edit_alert createState() => edit_alert();
-}
-
-class edit_alert extends State<EditAlert> {
-  late TextEditingController alert_name;
-  DateTime? selected_date;
-  String? selected_time;
-
-  @override
-  void initState() {
-    super.initState();
-    alert_name = TextEditingController(text: widget.alert['title']);
-    selected_date = DateTime.parse(widget.alert['date']);
-    selected_time = widget.alert['time'];
-  }
-
-  //Function to pick date
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selected_date ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null) {
-      setState(() {
-        selected_date = picked; //Store the selected date
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        //Display message to show success
-        SnackBar(
-            content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
-      );
-    }
-  }
-
-// Function to pick time
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (pickedTime != null) {
-      setState(() {
-        selected_time = pickedTime.format(context);
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Edit Alert')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: alert_name,
-              decoration: const InputDecoration(labelText: 'Title'),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => _selectDate(context),
-              child: const Text('Select Date'),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () => _selectTime(context),
-              child: const Text('Select Time'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                return null;
-              },
-              child: const Text('Delete'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                final updatedAlert = {
-                  'title': alert_name.text,
-                  'date': selected_date!.toLocal().toString().split(' ')[0],
-                  'time': selected_time,
-                };
-                Navigator.pop(context, updatedAlert);
-              },
-              child: const Text('Save Changes'),
-            ),
-            const SizedBox(height: 20),
           ],
         ),
       ),

@@ -1,0 +1,74 @@
+name: glucoguide-ci
+on:
+  pull_request:
+    branches:
+      - shane
+  push:
+    branches:
+      - shane
+      - main
+jobs:
+  test_glucoguide:
+    name: Testing Flutter Code
+    runs-on: ubuntu-latest
+    steps:
+      #1. Goes to the code
+      - name: Check the Code
+        uses: actions/checkout@v3
+      #2. Grabbed from the documentation on https://docs.flutter.dev/get-started/install/linux/web
+      - name: Install Flutter Development tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y curl unzip xz-utils zip
+      #3. Grabbed from https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz >> on same page as above
+      - name: Install Flutter SDK
+        run: |
+          curl -o flutter_linux.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && tar -xf flutter_linux.tar.xz && echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
+      #4. Check Version of Flutter
+      - name: Check Flutter Version
+        run: flutter --version
+      #5. Install Dep.
+      - name: Download All Dependencies 
+        run: |
+          cd glucoguide
+          flutter pub get
+      #6. Use Flutter to run tests
+      - name: Flutter Tests Code
+        run: | 
+          cd glucoguide
+          flutter test
+      #7. Use Flutter to Analyze the code
+      - name: Flutter Analyze Code
+        run: | 
+          cd glucoguide
+          flutter analyze
+
+  build_glucoguide:
+    name: Build GlucoGudie Application
+    runs-on: ubuntu-latest
+    steps:
+      #1. Goes to the code
+      - name: Check the Code
+        uses: actions/checkout@v3
+      #2. Grabbed from the documentation: https://docs.flutter.dev/get-started/install/linux/web
+      - name: Install Flutter Development tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y curl unzip xz-utils zip
+      #3. Grabbed from https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz >> on same page as above
+      - name: Install Flutter SDK
+        run: |
+          curl -o flutter_linux.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz && tar -xf flutter_linux.tar.xz && echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
+      #4. Check Version of Flutter
+      - name: Check Flutter Version
+        run: flutter --version
+      #5. Install Dep.
+      - name: Download All Dependencies 
+        run: |
+          cd glucoguide
+          flutter pub get
+      #6. Build GlucoGuide
+      - name: Build GlucoGuide Application
+        run: |
+          cd glucoguide
+          flutter build web

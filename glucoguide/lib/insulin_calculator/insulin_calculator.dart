@@ -19,7 +19,7 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
   final TextEditingController targetGlucoseController =
       TextEditingController(text: '100');
 
-  double insulinDose = 0.0;
+  double? insulinDose;
   bool canCalculateDose = false;
 
   void updateButtonState() {
@@ -41,6 +41,13 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
     setState(() {
       insulinDose =
           ((glucose - targetGlucose) / sensitivityFactor) + (carbs / carbRatio);
+
+      glucoseController.clear();
+      carbsController.clear();
+
+      canCalculateDose = false;
+
+      FocusScope.of(context).unfocus();
     });
 
     // Log the dose in a Map<String, dynamic> so it fits in the db
@@ -52,7 +59,7 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
       'note': 'test dose'
     };
 
-    // update user profile via user provider
+    // instantiate user provider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     // get current insulin dose logs and append the new log
@@ -99,8 +106,8 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
           onPressed: canCalculateDose ? calculateDose : null,
           child: const Text('Calculate Dose'),
         ),
-        if (insulinDose > 0)
-          Text('Dose: ${insulinDose.toStringAsFixed(2)} units'),
+        if (insulinDose != null)
+          Text('Dose: ${insulinDose!.toStringAsFixed(2)} units'),
       ],
     );
   }

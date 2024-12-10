@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:glucoguide/models/user_profile.dart';
 import 'package:glucoguide/services/user_service.dart';
@@ -27,10 +28,18 @@ class UserProvider with ChangeNotifier {
   /// - [uid]: The unique identifier for the user in Firestore.
   Future<void> loadUserProfile(String uid) async {
     try {
-      _userProfile = await _userService.fetchUserProfile(uid);
-      notifyListeners(); // Notify widgets that rely on this provider
+      final doc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      if (doc.exists) {
+        _userProfile = UserProfile.fromMap(
+            doc.data()!); // Map Firestore data to UserProfile
+        notifyListeners(); // Notify all listening widgets of the update
+      } else {
+        throw Exception("User profile not found for UID: $uid");
+      }
     } catch (e) {
       print("Error loading user profile: $e");
+      throw e; // Rethrow the error to be caught by the calling function
     }
   }
 
