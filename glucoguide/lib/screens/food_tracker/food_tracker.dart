@@ -17,10 +17,13 @@ class _FoodTrackerPageState extends State<FoodTrackerPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Tracking'),
+            const Text(
+              'Tracking',
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
-        backgroundColor: Colors.blue[700],
+        backgroundColor: const Color.fromARGB(147, 36, 185, 156),
         automaticallyImplyLeading: false,
       ),
       body: Container(

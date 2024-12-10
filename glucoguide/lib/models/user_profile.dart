@@ -1,3 +1,5 @@
+import 'package:csv/csv.dart';
+
 class UserProfile {
   // Basic user information fields
   String uid;
@@ -9,6 +11,7 @@ class UserProfile {
   int weight;
   String country;
   String unit;
+  int currentGlucoseLevel;
 
   // Logs (food, blood glucose and insulin doses)
   // Stored in a LIST of key value pairs
@@ -28,6 +31,7 @@ class UserProfile {
     required this.weight,
     required this.country,
     required this.unit,
+    this.currentGlucoseLevel = 0,
     this.foodLogs = const [],
     this.bloodGlucoseLogs = const [],
     this.insulinDoseLogs = const [],
@@ -50,7 +54,8 @@ class UserProfile {
       'foodLogs': foodLogs,
       'bloodGlucoseLogs': bloodGlucoseLogs,
       'insulinDoseLogs': insulinDoseLogs,
-      'alerts': alerts
+      'alerts': alerts,
+      'currentGlucoseLevel': currentGlucoseLevel,
     };
   }
 
@@ -72,6 +77,7 @@ class UserProfile {
             List<Map<String, dynamic>>.from(map['bloodGlucoseLogs'] ?? []),
         insulinDoseLogs:
             List<Map<String, dynamic>>.from(map['insulinDoseLogs'] ?? []),
-        alerts: List<Map<String, dynamic>>.from(map['alerts'] ?? []));
+        alerts: List<Map<String, dynamic>>.from(map['alerts'] ?? []),
+        currentGlucoseLevel: map['currentGlucoseLevel']);
   }
 }

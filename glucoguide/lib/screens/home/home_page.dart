@@ -21,7 +21,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Welcome To GlucoGuide!',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromARGB(147, 36, 185, 156),
@@ -87,7 +87,7 @@ class HomePage extends StatelessWidget {
               Text(
                 "Welcome, ${userProfile!.name}!",
                 style: const TextStyle(
-                  fontSize: 26,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color.fromARGB(255, 20, 100, 160),
                 ),
@@ -157,30 +157,9 @@ class CurrentBloodGlucoseWidget extends StatelessWidget {
 
         // Extract insulin dose logs and current blood glucose
         final userData = snapshot.data!.data() as Map<String, dynamic>?;
-        if (userData == null || !userData.containsKey('insulinDoseLogs')) {
-          return const Center(
-              child: Text(
-            "No blood glucose logs available",
-            style: TextStyle(fontSize: 16, color: Colors.orangeAccent),
-          ));
-        }
-
-        final insulinDoseLogs = (userData['insulinDoseLogs'] as List<dynamic>?)
-            ?.map((log) => log as Map<String, dynamic>)
-            .toList();
-
-        // Make sure insulindoselogs is not empty or null, if so display message
-        if (insulinDoseLogs == null || insulinDoseLogs.isEmpty) {
-          return const Center(
-              child: Text(
-            "No blood glucose logs available",
-            style: TextStyle(fontSize: 16, color: Colors.orangeAccent),
-          ));
-        }
 
         // Get current blood glucose level (from last log)
-        final currentBloodGlucose =
-            insulinDoseLogs.last['bloodGlucLevel'] ?? "N/A";
+        final currentBloodGlucose = userData?['currentGlucoseLevel']!;
 
         return Padding(
           padding: const EdgeInsets.all(8.0),

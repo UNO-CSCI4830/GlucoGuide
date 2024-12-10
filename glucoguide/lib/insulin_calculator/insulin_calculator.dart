@@ -16,6 +16,7 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
       TextEditingController();
   final TextEditingController carbRatioController = TextEditingController();
   final TextEditingController targetGlucoseController = TextEditingController();
+  final TextEditingController noteController = TextEditingController();
 
   double insulinDose = 0.0;
   bool canCalculateDose = false;
@@ -41,24 +42,25 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
         double.tryParse(sensitivityFactorController.text) ?? 0.0;
     final carbRatio = double.tryParse(carbRatioController.text) ?? 0.0;
     final targetGlucose = double.tryParse(targetGlucoseController.text) ?? 0.0;
+    final note = noteController.text;
 
-    if (glucose == null || glucose < 0) {
+    if (glucose <= 0) {
       _showError("Please enter a valid glucose value.");
       return;
     }
-    if (carbs == null || carbs < 0) {
+    if (carbs < 0) {
       _showError("Please enter a valid carb value.");
       return;
     }
-    if (sensitivityFactor == null || sensitivityFactor <= 0) {
+    if (sensitivityFactor <= 0) {
       _showError("Sensitivity factor must be greater than 0.");
       return;
     }
-    if (carbRatio == null || carbRatio <= 0) {
+    if (carbRatio <= 0) {
       _showError("Carb ratio must be greater than 0.");
       return;
     }
-    if (targetGlucose == null || targetGlucose < 0) {
+    if (targetGlucose < 0) {
       _showError("Please enter a valid target glucose value.");
       return;
     }
@@ -68,24 +70,19 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
           ((glucose - targetGlucose) / sensitivityFactor) + (carbs / carbRatio);
     });
 
-    // Log the dose in a Map<String, dynamic> so it fits in the db
-    // list properly, all logs will be the same way, and alerts.
     final insulinDoseLog = {
       'time': DateTime.now().toString(),
       'dosage': insulinDose,
       'bloodGlucLevel': glucose,
-      'note': 'test dose'
+      'note': note.isEmpty ? "No note provided" : note,
     };
 
-    // update user profile via user provider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    // get current insulin dose logs and append the new log
     final currentLogs = List<Map<String, dynamic>>.from(
         userProvider.userProfile?.insulinDoseLogs ?? []);
     currentLogs.add(insulinDoseLog);
 
-    // update userProfile
     userProvider.updateUserProfile({'insulinDoseLogs': currentLogs});
   }
 
@@ -96,29 +93,35 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
         TextField(
           controller: glucoseController,
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(labelText: 'Blood Glucose (mg/dL)'),
+          decoration: const InputDecoration(labelText: 'Blood Glucose (mg/dL)'),
           onChanged: (value) => updateButtonState(),
         ),
         TextField(
           controller: carbsController,
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(labelText: 'Carbs (g)'),
+          decoration: const InputDecoration(labelText: 'Carbs (g)'),
           onChanged: (value) => updateButtonState(),
         ),
         TextField(
           controller: sensitivityFactorController,
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(labelText: 'Sensitivity Factor'),
+          decoration: const InputDecoration(labelText: 'Sensitivity Factor'),
         ),
         TextField(
           controller: carbRatioController,
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(labelText: 'Carb Ratio'),
+          decoration: const InputDecoration(labelText: 'Carb Ratio'),
         ),
         TextField(
           controller: targetGlucoseController,
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(labelText: 'Target Glucose (mg/dL)'),
+          decoration:
+              const InputDecoration(labelText: 'Target Glucose (mg/dL)'),
+        ),
+        TextField(
+          controller: noteController,
+          keyboardType: TextInputType.text,
+          decoration: const InputDecoration(labelText: 'Note (optional)'),
         ),
         ElevatedButton(
           onPressed: canCalculateDose ? calculateDose : null,

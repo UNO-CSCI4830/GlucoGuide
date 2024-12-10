@@ -14,6 +14,8 @@ void setupFirebaseAuthMocks([Callback? customHandlers]) {
   setupFirebaseCoreMocks();
 }
 
+void setupFirebaseCoreMocks() {}
+
 Future<T> neverEndingFuture<T>() async {
   // ignore: literal_only_boolean_expressions
   while (true) {
