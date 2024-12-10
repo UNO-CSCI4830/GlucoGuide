@@ -6,10 +6,12 @@ import 'package:glucoguide/screens/app_settings/app_settings.dart';
 import 'package:glucoguide/screens/login/login_page.dart';
 import 'package:glucoguide/screens/signup/register__page.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: "./.env");
   await Firebase.initializeApp(); // Initialize Firebase
 
   runApp(

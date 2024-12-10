@@ -13,13 +13,11 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
   final TextEditingController glucoseController = TextEditingController();
   final TextEditingController carbsController = TextEditingController();
   final TextEditingController sensitivityFactorController =
-      TextEditingController(text: '50');
-  final TextEditingController carbRatioController =
-      TextEditingController(text: '10');
-  final TextEditingController targetGlucoseController =
-      TextEditingController(text: '100');
+      TextEditingController();
+  final TextEditingController carbRatioController = TextEditingController();
+  final TextEditingController targetGlucoseController = TextEditingController();
 
-  double? insulinDose;
+  double insulinDose = 0.0;
   bool canCalculateDose = false;
 
   void updateButtonState() {
@@ -29,25 +27,45 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
     });
   }
 
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: const Color.fromARGB(255, 228, 139, 133),
+    ));
+  }
+
   void calculateDose() {
     final glucose = double.tryParse(glucoseController.text) ?? 0.0;
     final carbs = double.tryParse(carbsController.text) ?? 0.0;
     final sensitivityFactor =
-        double.tryParse(sensitivityFactorController.text) ?? 50.0;
-    final carbRatio = double.tryParse(carbRatioController.text) ?? 10.0;
-    final targetGlucose =
-        double.tryParse(targetGlucoseController.text) ?? 100.0;
+        double.tryParse(sensitivityFactorController.text) ?? 0.0;
+    final carbRatio = double.tryParse(carbRatioController.text) ?? 0.0;
+    final targetGlucose = double.tryParse(targetGlucoseController.text) ?? 0.0;
+
+    if (glucose == null || glucose < 0) {
+      _showError("Please enter a valid glucose value.");
+      return;
+    }
+    if (carbs == null || carbs < 0) {
+      _showError("Please enter a valid carb value.");
+      return;
+    }
+    if (sensitivityFactor == null || sensitivityFactor <= 0) {
+      _showError("Sensitivity factor must be greater than 0.");
+      return;
+    }
+    if (carbRatio == null || carbRatio <= 0) {
+      _showError("Carb ratio must be greater than 0.");
+      return;
+    }
+    if (targetGlucose == null || targetGlucose < 0) {
+      _showError("Please enter a valid target glucose value.");
+      return;
+    }
 
     setState(() {
       insulinDose =
           ((glucose - targetGlucose) / sensitivityFactor) + (carbs / carbRatio);
-
-      glucoseController.clear();
-      carbsController.clear();
-
-      canCalculateDose = false;
-
-      FocusScope.of(context).unfocus();
     });
 
     // Log the dose in a Map<String, dynamic> so it fits in the db
@@ -59,7 +77,7 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
       'note': 'test dose'
     };
 
-    // instantiate user provider
+    // update user profile via user provider
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     // get current insulin dose logs and append the new log
@@ -106,8 +124,8 @@ class _InsulinDoseCalculatorState extends State<InsulinDoseCalculator> {
           onPressed: canCalculateDose ? calculateDose : null,
           child: const Text('Calculate Dose'),
         ),
-        if (insulinDose != null)
-          Text('Dose: ${insulinDose!.toStringAsFixed(2)} units'),
+        if (insulinDose > 0)
+          Text('Dose: ${insulinDose.toStringAsFixed(2)} units'),
       ],
     );
   }

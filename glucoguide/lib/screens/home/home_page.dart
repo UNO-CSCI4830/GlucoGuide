@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glucoguide/insulin_calculator/export_functionality.dart';
 import '../summary/summary.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,6 +15,8 @@ class HomePage extends StatelessWidget {
     final User? user = FirebaseAuth.instance.currentUser;
     final userProfile = Provider.of<UserProvider>(context).userProfile;
 
+    final ExportService exportService = ExportService();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -23,6 +26,29 @@ class HomePage extends StatelessWidget {
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromARGB(147, 36, 185, 156),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.file_download),
+            tooltip: 'Export',
+            onPressed: () async {
+              if (user != null) {
+                try {
+                  final exportMessage =
+                      await exportService.exportLogs(user.uid);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(exportMessage)),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: ${e.toString()}')),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('User not logged in')),
+                );
+              }
+            },
+          ),
           PopupMenuButton<int>(
             icon: const Icon(Icons.more_vert),
             shape: const RoundedRectangleBorder(
