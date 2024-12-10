@@ -36,6 +36,10 @@ class BottomNavBar extends StatelessWidget {
           icon: Icon(Icons.track_changes),
           label: 'Track',
         ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.bar_chart),
+          label: 'Summary',
+        ),
       ],
     );
   }

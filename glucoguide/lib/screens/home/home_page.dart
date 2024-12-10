@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../summary/summary.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -77,6 +78,20 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               InsulinDoseLogsWidget(userId: user?.uid ?? ""),
+              Text(
+              'Welcome, $name!',
+              style: const TextStyle(fontSize: 24),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SummaryPage()),
+                );
+              },
+              child: const Text('Go to Summary'),
+            ),
             ],
           ),
         ),
