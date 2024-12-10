@@ -11,8 +11,9 @@ class DeleteAccountPage extends StatefulWidget {
 }
 
 class _DeleteAccountPageState extends State<DeleteAccountPage> {
-  final _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final User? userr = FirebaseAuth.instance.currentUser;
 
   String _status = ''; // Status message to display registration result
 
@@ -28,16 +29,21 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Please enter your password to delete your account"),
+              Text("Please enter your email to delete your account"),
               TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: "Password"),
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: "Email"),
                 obscureText: true,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                   onPressed: () {
-                    _confirmAccountDeletion(context);
+                    if (_emailController.text.trim() == userr?.email) {
+                      _confirmAccountDeletion(
+                          context, _emailController.toString());
+                    } else {
+                      _wrongEmail(context);
+                    }
                   },
                   child: const Text('Delete Account')),
               const SizedBox(height: 20),
@@ -47,13 +53,13 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
         ));
   }
 
-  void _confirmAccountDeletion(BuildContext context) {
+  void _confirmAccountDeletion(BuildContext context, String email) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Text('Warning: Deleting your account permanently'
-              'deletes your information. This action cannot'
+          content: Text('Warning: Deleting your account permanently '
+              'deletes your information. This action cannot '
               'be undone. Select Yes to delete your account.'),
           actions: <Widget>[
             TextButton(
@@ -67,9 +73,28 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                 _deleteAccount();
                 const Text('Button yes');
                 Navigator.of(context).pop();
-                _passwordController.clear();
+                _emailController.clear();
               },
               child: Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _wrongEmail(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context2) {
+        return AlertDialog(
+          title: Text('That is not your email. Please try again.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.pop(context2);
+              },
             ),
           ],
         );
@@ -88,7 +113,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
           );
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => LoginPage()));
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       print('Error deleting account');
       showDialog(
         context: context,

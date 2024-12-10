@@ -42,7 +42,9 @@ class _EditProfilePage extends State<EditProfilePage> {
           fieldName: 'weight',
           text: (userProfile.weight).toString()),
       EditProfileItems(
-          title: 'Date of Birth', fieldName: 'dateOfBirth', text: ''),
+          title: 'Date of Birth',
+          fieldName: 'dateOfBirth',
+          text: userProfile.dateOfBirth),
     ];
     return Card(
         child: StreamBuilder<DocumentSnapshot>(
@@ -88,6 +90,7 @@ class _EditProfilePage extends State<EditProfilePage> {
                                       onTap: () {
                                         updateUserGender(user, 'Male');
                                         setting.text = 'Male';
+                                        userProfile.gender = 'Male';
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -96,6 +99,7 @@ class _EditProfilePage extends State<EditProfilePage> {
                                       onTap: () {
                                         updateUserGender(user, 'Female');
                                         setting.text = 'Female';
+                                        userProfile.gender = 'Female';
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -134,6 +138,7 @@ class _EditProfilePage extends State<EditProfilePage> {
                                       onTap: () {
                                         updateUserUnits(user, 'kg');
                                         setting.text = 'kg';
+                                        userProfile.unit = 'kg';
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -156,6 +161,7 @@ class _EditProfilePage extends State<EditProfilePage> {
                                       onTap: () {
                                         updateUserUnits(user, 'lbs');
                                         setting.text = 'lbs';
+                                        userProfile.unit = 'lbs';
                                         Navigator.pop(context);
                                       },
                                     ),
@@ -187,6 +193,7 @@ class _EditProfilePage extends State<EditProfilePage> {
                                     onPressed: () {
                                       updateUserName(user, inputValue);
                                       setting.text = inputValue;
+                                      userProfile.name = inputValue;
                                       Navigator.pop(context);
                                     },
                                   ),
@@ -217,7 +224,9 @@ class _EditProfilePage extends State<EditProfilePage> {
                                     child: Text('OK'),
                                     onPressed: () {
                                       updateWeight(user, inputValue);
-                                      setting.text = inputValue;
+                                      setting.text = "$inputValue cm";
+                                      userProfile.height =
+                                          int.tryParse(inputValue) ?? 0;
                                       Navigator.pop(context);
                                     },
                                   ),
@@ -248,6 +257,7 @@ class _EditProfilePage extends State<EditProfilePage> {
                                     onPressed: () {
                                       updateCountry(user, inputValue);
                                       setting.text = inputValue;
+                                      userProfile.country = inputValue;
                                       Navigator.pop(context);
                                     },
                                   ),
@@ -279,6 +289,8 @@ class _EditProfilePage extends State<EditProfilePage> {
                                     onPressed: () {
                                       updateWeight(user, inputValue);
                                       setting.text = inputValue;
+                                      userProfile.weight =
+                                          int.tryParse(inputValue) ?? 0;
                                       Navigator.pop(context);
                                     },
                                   ),
@@ -297,6 +309,8 @@ class _EditProfilePage extends State<EditProfilePage> {
                             setState(() {
                               inputValue =
                                   "${pickedDate.toLocal()}".split(' ')[0];
+                              setting.text = inputValue;
+                              userProfile.dateOfBirth = inputValue;
                             });
                           }
                           updateDateOfBirth(user, inputValue);

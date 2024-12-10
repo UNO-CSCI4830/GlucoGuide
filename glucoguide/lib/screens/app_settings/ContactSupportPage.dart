@@ -9,48 +9,54 @@ class ContactSupportPage extends StatefulWidget {
 
 class _ContactSupportState extends State<ContactSupportPage> {
   final TextEditingController feedbackController = TextEditingController();
-  final List<String> entries = [];
-
-  void submitEntry() {
-    // Send the feedback to the server
-    entries.add(feedbackController.text);
-    _dialogBuilder(context);
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Contact Support'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: feedbackController,
-              decoration: InputDecoration(
-                hintText: 'Enter your message',
+        appBar: AppBar(
+          title: Center(child: const Text('Contact Support')),
+          backgroundColor: Colors.white,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Please enter your feedback"),
+              TextField(
+                controller: feedbackController,
+                decoration: const InputDecoration(labelText: "Feedback"),
+                obscureText: true,
               ),
-            ),
-            ElevatedButton(
+              const SizedBox(height: 20),
+              ElevatedButton(
+                  onPressed: () {
+                    _submissionPopup(context);
+                  },
+                  child: const Text('Submit')),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ));
+  }
+
+  void _submissionPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context2) {
+        return AlertDialog(
+          title: Text('Your feedback was submitted.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
               onPressed: () {
-                submitEntry();
                 feedbackController.clear();
+                Navigator.pop(context2);
               },
-              child: Text('Submit'),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
-}
-
-Future<void> _dialogBuilder(BuildContext context) {
-  return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(title: const Text('Submission was Successful!'));
-      });
 }

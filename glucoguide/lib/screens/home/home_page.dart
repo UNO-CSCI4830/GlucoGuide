@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../summary/summary.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:glucoguide/providers/user_provider.dart';
+import 'package:glucoguide/screens/login/login_page.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -9,7 +12,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
-    final String name = user?.email.toString() ?? "User";
+    final userProfile = Provider.of<UserProvider>(context).userProfile;
 
     return Scaffold(
       appBar: AppBar(
@@ -35,12 +38,15 @@ class HomePage extends StatelessWidget {
               ),
               const PopupMenuItem(
                 value: 2,
-                child: Text('Other'),
+                child: Text('Log Out'),
               ),
             ],
             onSelected: (value) {
               if (value == 1) {
                 Navigator.pushNamed(context, '/app_settings');
+              }
+              if (value == 2) {
+                _handleLogout(context);
               }
             },
           ),
@@ -53,7 +59,7 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Welcome, $name!',
+                "Welcome, ${userProfile!.name}!",
                 style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
@@ -287,6 +293,27 @@ class InsulinDoseLogsWidget extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+Future<void> _handleLogout(BuildContext context) async {
+  try {
+    // Sign out the user from Firebase
+    await FirebaseAuth.instance.signOut();
+
+    // Clear the UserProvider state
+    Provider.of<UserProvider>(context, listen: false).clearUserProfile();
+
+    // Navigate to the login page
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false, // Remove all previous routes
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error logging out: $e')),
     );
   }
 }

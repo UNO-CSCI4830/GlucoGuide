@@ -6,10 +6,7 @@ import 'package:glucoguide/screens/app_settings/ChangePasswordPage.dart';
 import 'package:glucoguide/screens/app_settings/ContactSupportPage.dart';
 import 'package:glucoguide/screens/app_settings/DeleteAccountPage.dart';
 import 'package:glucoguide/screens/app_settings/EditProfilePage.dart';
-import 'package:glucoguide/screens/app_settings/NotificationSettingsPage.dart';
 import 'package:glucoguide/screens/app_settings/PrivacyCenterPage.dart';
-import 'package:glucoguide/screens/app_settings/PushNotificationPage.dart';
-import 'package:glucoguide/screens/app_settings/ReminderPage.dart';
 import 'package:glucoguide/screens/login/login_page.dart';
 import 'package:provider/provider.dart';
 
@@ -47,7 +44,6 @@ class _MyAccountState extends State<AppSettingsPage> {
     final List<SettingItem> settings = [
       SettingItem(
         title: 'My Account',
-        nextPage: NotificationSettingsPage(),
       ),
       SettingItem(
         title: 'Edit Profile',
@@ -67,18 +63,11 @@ class _MyAccountState extends State<AppSettingsPage> {
       SettingItem(
         title: 'Log Out',
         icon: Icons.logout_rounded,
-        // make this secure
         nextPage: null,
       ),
       SettingItem(
         // Index = 5
         title: 'Settings',
-        nextPage: NotificationSettingsPage(),
-      ),
-      SettingItem(
-        title: 'Reminders',
-        icon: Icons.event,
-        nextPage: ReminderPage(),
       ),
       SettingItem(
         title: 'Privacy Center',
@@ -86,14 +75,8 @@ class _MyAccountState extends State<AppSettingsPage> {
         nextPage: PrivacyCenterPage(),
       ),
       SettingItem(
-        title: 'Push Notifications',
-        icon: Icons.notifications,
-        nextPage: PushNotificationPage(),
-      ),
-      SettingItem(
-        // Index = 9
+        // Index = 7
         title: 'Help',
-        nextPage: NotificationSettingsPage(),
       ),
       SettingItem(
         title: 'About Us',
@@ -130,7 +113,7 @@ class _MyAccountState extends State<AppSettingsPage> {
                         fontSize: 18,
                       )));
             }
-            if (index == 9) {
+            if (index == 7) {
               return Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Text('Help',
@@ -165,7 +148,7 @@ class _MyAccountState extends State<AppSettingsPage> {
 class SettingItem {
   final String title;
   final IconData? icon;
-  final Widget? nextPage;
+  Widget? nextPage;
 
   SettingItem({
     required this.title,
