@@ -18,10 +18,6 @@ class _FoodTrackerPageState extends State<FoodTrackerPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text('Tracking'),
-            CircleAvatar(
-              backgroundImage: AssetImage(
-                  'assets/profile.jpg'), // Replace with actual image path
-            ),
           ],
         ),
         backgroundColor: Colors.blue[700],
@@ -30,7 +26,10 @@ class _FoodTrackerPageState extends State<FoodTrackerPage> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue[50]!, Colors.blue[100]!],
+            colors: [
+              Colors.blue[50]!,
+              const Color.fromARGB(255, 82, 143, 193)!
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
