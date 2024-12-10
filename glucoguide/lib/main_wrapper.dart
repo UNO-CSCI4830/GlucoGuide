@@ -7,6 +7,7 @@ import 'package:glucoguide/screens/app_settings/app_settings.dart';
 import 'package:glucoguide/screens/food_tracker/food_tracker.dart';
 import 'package:glucoguide/screens/home/home_page.dart';
 import 'package:glucoguide/screens/profile/profile.dart';
+import 'package:glucoguide/screens/summary/summary.dart';
 
 class MainWrapper extends StatefulWidget {
   const MainWrapper({super.key});
@@ -22,7 +23,8 @@ class _MainWrapperState extends State<MainWrapper> {
     const HomePage(),
     const ProfilePage(),
     const AlertsPage(),
-    const FoodTrackerPage()
+    const FoodTrackerPage(),
+    const SummaryPage(),
   ];
 
   @override

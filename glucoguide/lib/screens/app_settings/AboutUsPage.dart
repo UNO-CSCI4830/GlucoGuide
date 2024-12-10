@@ -7,13 +7,21 @@ class AboutUsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('About Us'),
+        title: const Text('About'),
       ),
 
       // Account Settings page
       body: Center(
-        child: const Text('About Us'),
-      ),
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Text('GlucoGuide',
+            style: TextStyle(
+                fontSize: 50,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(147, 36, 185, 156))),
+        Text('Version 1.0', style: TextStyle(fontSize: 25)),
+        Text('Copyright 2024, GlucoGuide. All rights reserved.',
+            style: TextStyle(fontSize: 15)),
+      ])),
     );
   }
 }
