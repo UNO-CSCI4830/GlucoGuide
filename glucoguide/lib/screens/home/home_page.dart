@@ -112,14 +112,31 @@ class CurrentBloodGlucoseWidget extends StatelessWidget {
         }
 
         // Extract insulin dose logs and current blood glucose
-        final userData = snapshot.data!.data() as Map<String, dynamic>;
+        final userData = snapshot.data!.data() as Map<String, dynamic>?;
+        if (userData == null || !userData.containsKey('insulinDoseLogs')) {
+          return const Center(
+              child: Text(
+            "No blood glucose logs available",
+            style: TextStyle(fontSize: 16, color: Colors.orangeAccent),
+          ));
+        }
+
         final insulinDoseLogs = (userData['insulinDoseLogs'] as List<dynamic>?)
             ?.map((log) => log as Map<String, dynamic>)
             .toList();
 
+        // Make sure insulindoselogs is not empty or null, if so display message
+        if (insulinDoseLogs == null || insulinDoseLogs.isEmpty) {
+          return const Center(
+              child: Text(
+            "No blood glucose logs available",
+            style: TextStyle(fontSize: 16, color: Colors.orangeAccent),
+          ));
+        }
+
         // Get current blood glucose level (from last log)
         final currentBloodGlucose =
-            (insulinDoseLogs?.last)?['bloodGlucLevel'] ?? "N/A";
+            insulinDoseLogs.last['bloodGlucLevel'] ?? "N/A";
 
         return Padding(
           padding: const EdgeInsets.all(8.0),
@@ -186,7 +203,7 @@ class InsulinDoseLogsWidget extends StatelessWidget {
           return const Center(
             child: Text(
               "No insulin dose logs available",
-              style: TextStyle(fontSize: 16, color: Colors.redAccent),
+              style: TextStyle(fontSize: 16, color: Colors.orangeAccent),
             ),
           );
         }
@@ -201,7 +218,7 @@ class InsulinDoseLogsWidget extends StatelessWidget {
           return const Center(
             child: Text(
               "No logs available",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: 16, color: Colors.orangeAccent),
             ),
           );
         }
