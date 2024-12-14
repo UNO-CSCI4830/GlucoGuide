@@ -27,7 +27,7 @@ class Add_Alert extends State<AddAlert> {
       ScaffoldMessenger.of(context).showSnackBar(
         //Display message to show success
         SnackBar(
-            content: Text('Selected Date: ${picked.toLocal()}'.split(' ')[0])),
+            content: Text('Selected Date'), duration: Duration(seconds: 2),),
       );
     }
   }
@@ -43,6 +43,11 @@ class Add_Alert extends State<AddAlert> {
         () {
           selectedTime = pickedTime.format(context);
         },
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        //Display message to show success
+        SnackBar(
+            content: Text('Selected Time'), duration: Duration(seconds: 2),),
       );
     }
   }
@@ -80,6 +85,10 @@ class Add_Alert extends State<AddAlert> {
                     'date': selectedDate!.toLocal().toString().split(' ')[0],
                     'time': selectedTime,
                   };
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar( 
+                    const SnackBar(content: Text('Saved Alert'), duration: Duration(seconds: 2),),
+                  );
                   Navigator.pop(context, newAlert);
                 }
               },
