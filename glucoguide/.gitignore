@@ -9,14 +9,20 @@
 .history
 .svn/
 migrate_working_dir/
+*.env
+pubspec.lock
 
 # IntelliJ related
 *.iml
 *.ipr
 *.iws
 .idea/
+<<<<<<< HEAD
 pubspeck.lock
 
+=======
+pubspec.lock
+>>>>>>> origin
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.

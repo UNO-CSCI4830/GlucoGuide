@@ -1,14 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:glucoguide/providers/user_provider.dart';
 import 'package:glucoguide/screens/app_settings/AboutUsPage.dart';
 import 'package:glucoguide/screens/app_settings/ChangePasswordPage.dart';
 import 'package:glucoguide/screens/app_settings/ContactSupportPage.dart';
 import 'package:glucoguide/screens/app_settings/DeleteAccountPage.dart';
 import 'package:glucoguide/screens/app_settings/EditProfilePage.dart';
-import 'package:glucoguide/screens/app_settings/NotificationSettingsPage.dart';
 import 'package:glucoguide/screens/app_settings/PrivacyCenterPage.dart';
-import 'package:glucoguide/screens/app_settings/PushNotificationPage.dart';
-import 'package:glucoguide/screens/app_settings/ReminderPage.dart';
 import 'package:glucoguide/screens/login/login_page.dart';
+import 'package:provider/provider.dart';
 
 class AppSettingsPage extends StatefulWidget {
   const AppSettingsPage({super.key});
@@ -17,13 +17,33 @@ class AppSettingsPage extends StatefulWidget {
   State<AppSettingsPage> createState() => _MyAccountState();
 }
 
+Future<void> _handleLogout(BuildContext context) async {
+  try {
+    // Sign out the user from Firebase
+    await FirebaseAuth.instance.signOut();
+
+    // Clear the UserProvider state
+    Provider.of<UserProvider>(context, listen: false).clearUserProfile();
+
+    // Navigate to the login page
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false, // Remove all previous routes
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error logging out: $e')),
+    );
+  }
+}
+
 class _MyAccountState extends State<AppSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final List<SettingItem> settings = [
       SettingItem(
         title: 'My Account',
-        nextPage: NotificationSettingsPage(),
       ),
       SettingItem(
         title: 'Edit Profile',
@@ -43,18 +63,11 @@ class _MyAccountState extends State<AppSettingsPage> {
       SettingItem(
         title: 'Log Out',
         icon: Icons.logout_rounded,
-        // make this secure
-        nextPage: LoginPage(),
+        nextPage: null,
       ),
       SettingItem(
         // Index = 5
         title: 'Settings',
-        nextPage: NotificationSettingsPage(),
-      ),
-      SettingItem(
-        title: 'Reminders',
-        icon: Icons.event,
-        nextPage: ReminderPage(),
       ),
       SettingItem(
         title: 'Privacy Center',
@@ -62,14 +75,8 @@ class _MyAccountState extends State<AppSettingsPage> {
         nextPage: PrivacyCenterPage(),
       ),
       SettingItem(
-        title: 'Push Notifications',
-        icon: Icons.notifications,
-        nextPage: PushNotificationPage(),
-      ),
-      SettingItem(
-        // Index = 9
+        // Index = 7
         title: 'Help',
-        nextPage: NotificationSettingsPage(),
       ),
       SettingItem(
         title: 'About Us',
@@ -106,7 +113,7 @@ class _MyAccountState extends State<AppSettingsPage> {
                         fontSize: 18,
                       )));
             }
-            if (index == 9) {
+            if (index == 7) {
               return Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Text('Help',
@@ -119,12 +126,16 @@ class _MyAccountState extends State<AppSettingsPage> {
               leading: Icon(setting.icon),
               title: Text(setting.title),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => setting.nextPage,
-                  ),
-                );
+                if (setting.nextPage == null) {
+                  _handleLogout(context);
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => setting.nextPage!,
+                    ),
+                  );
+                }
               },
             );
           }),
@@ -137,11 +148,11 @@ class _MyAccountState extends State<AppSettingsPage> {
 class SettingItem {
   final String title;
   final IconData? icon;
-  final Widget nextPage;
+  Widget? nextPage;
 
   SettingItem({
     required this.title,
     this.icon,
-    required this.nextPage,
+    this.nextPage,
   });
 }
