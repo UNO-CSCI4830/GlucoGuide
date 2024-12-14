@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:glucoguide/providers/user_provider.dart';
-import 'package:glucoguide/widgets/insulin_calculator.dart';
+import 'package:glucoguide/insulin_calculator/insulin_calculator.dart';
 import 'package:glucoguide/screens/food_tracker/food_tracker.dart';
 import 'package:provider/provider.dart';
 
