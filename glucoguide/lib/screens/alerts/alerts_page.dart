@@ -201,6 +201,7 @@ class _AlertsPageState extends State<AlertsPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
+              key: Key('addNewAlertButton'),
               onPressed: () async {
                 // Navigate to AddAlert page and wait for result
                 final newAlert = await Navigator.push(

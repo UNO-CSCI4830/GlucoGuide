@@ -144,6 +144,7 @@ Future<void> _updateAlert() async {
               child: const Text('Update Alert'),
             ),
             ElevatedButton(
+              key: Key("deleteButton"),
               onPressed: _deleteAlert,
               child: const Text('Delete Alert'),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
