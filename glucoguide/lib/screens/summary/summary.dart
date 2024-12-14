@@ -18,8 +18,10 @@ class SummaryPage extends StatefulWidget {
 }
 
 class SummaryPageState extends State<SummaryPage> {
+
   double _a1cGoal = 6.5;
   final List<BloodGlucoseLog> _glucoseLogs = [];
+
 
   void _updateA1CGoal() async {
     double? newGoal = await showDialog<double>(
@@ -29,6 +31,7 @@ class SummaryPageState extends State<SummaryPage> {
         return AlertDialog(
           title: const Text('Set New A1C Goal'),
           content: TextField(
+            key: const Key('a1cGoalField'),
             controller: controller,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
@@ -173,6 +176,7 @@ class SummaryPageState extends State<SummaryPage> {
           ),
         ),
         TextField(
+          key: const Key('glucoseInputField'),
           controller: glucoseController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
@@ -182,9 +186,10 @@ class SummaryPageState extends State<SummaryPage> {
         ),
         SizedBox(height: 10),
         ElevatedButton(
+          key: const Key('addReadingButton'),
           onPressed: () {
             if (glucoseController.text.isNotEmpty) {
-              _addGlucoseReading(double.parse(glucoseController.text));
+              addGlucoseReading(double.parse(glucoseController.text));
               glucoseController.clear();
             }
           },
@@ -196,11 +201,13 @@ class SummaryPageState extends State<SummaryPage> {
     );
   }
 
+
   String _formatTime(DateTime time) {
     final hour = time.hour % 12 == 0 ? 12 : time.hour % 12;
     final period = time.hour >= 12 ? "PM" : "AM";
     final minute = time.minute.toString().padLeft(2, '0');
     return "$hour:$minute $period";
+
   }
 
 // _addGlucoseReading was here before
