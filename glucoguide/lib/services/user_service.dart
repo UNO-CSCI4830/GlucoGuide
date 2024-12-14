@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:glucoguide/models/user_profile.dart';
 
 class UserService {
@@ -16,7 +15,7 @@ class UserService {
         return UserProfile.fromMap(snapshot.data()!);
       }
     } catch (e) {
-      print("Error printing user profile: $e");
+      // print("Error printing user profile: $e");
     }
 
     return null;

@@ -13,20 +13,17 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
+      iconSize: 42.69,
       currentIndex: currentIndex,
       onTap: onTap, // Trigger callback when a tab is tapped
       unselectedItemColor: Colors.black,
-      selectedItemColor: Colors.red,
+      selectedItemColor: const Color.fromARGB(255, 28, 184, 152),
       showSelectedLabels: true,
       showUnselectedLabels: true,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.notifications),
