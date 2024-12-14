@@ -1,3 +1,24 @@
+# Gluco Gudie - Installation Guide
+
+Make sure that all steps have been followed for flutter to run with an Android Emulator
+- That can be found on [Flutters website](https://flutter.dev/)
+
+1. Make sure you cd into the project application
+```bash
+cd glucoguide
+```
+2. Make sure all the dependencies are downloaded.
+```bash
+flutter clean
+flutter pub get
+```
+3. In VScode (or in the IDE) Select the Device (Android Emulator), and run this in the terminal.
+```bash
+flutter run
+```
+**Note: Make sure the set up the [.env](#setup-nutritionix) for the API calls.**
+---
+
 # Gluco Guide - Git Guide
 
 This document serves as a quick reference for GIT commands that might be needed for the project
