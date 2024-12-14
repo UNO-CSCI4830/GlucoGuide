@@ -146,7 +146,16 @@ This document serves as a quick reference for API Calls using Flutter/Dart.
 
 Before you are able to start doing API request, you need to generate an API key:
 
-1. ** Changed Food Resource. Will Update later  **
+1. Make an account through [Nutritionx](https://developer.nutritionix.com)
+2. Pull The Application ID and Application Keys
+3. Make a ```.env``` file inside the root directory of the application
+4. Take the Application ID and save it under variable ```API_ID``` and the API Key set to ```API_Key```
+
+It should look like as follows:
+```.env
+API_ID=<APPLICATION ID>
+API_KEY=<API KEY>
+```
 
 ---
 
