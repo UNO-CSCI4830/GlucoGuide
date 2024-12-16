@@ -189,7 +189,7 @@ class SummaryPageState extends State<SummaryPage> {
           key: const Key('addReadingButton'),
           onPressed: () {
             if (glucoseController.text.isNotEmpty) {
-              addGlucoseReading(double.parse(glucoseController.text));
+              _addGlucoseReading(double.parse(glucoseController.text));
               glucoseController.clear();
             }
           },
